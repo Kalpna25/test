@@ -1,0 +1,126 @@
+module CoverGroup_tb;
+
+  // Clock generation (50ns period)
+  bit clk;
+  initial clk = 0;
+  always #25 clk = ~clk;
+
+  // Class containing random signals and covergroups
+  class CoverGroup;
+
+    // Random signals
+    rand bit [3:0] signal1;
+    rand byte signal2;
+    rand logic [6:0] signal3;
+    rand bit enable;
+
+    // Constraints to ensure valid ranges
+  constraint signal_c { enable inside {0, 1}; }
+
+    // Covergroup 1
+    covergroup cg1 @(posedge clk);
+      option.name = "Covergroup1";
+      option.per_instance = 1;
+      option.weight = 3;
+      option.goal = 100;
+      option.at_least = 1;
+      option.auto_bin_max = 500;
+
+      cp1: coverpoint signal1 iff (enable) {
+        bins explicit_bins = {4, 8};
+        bins transition_bins = (0 => 4 => 8);
+      }
+
+      cp2: coverpoint signal2 iff (enable) {
+        bins explicit_bins = {10, 20};
+        bins transition_bins = (5 => 10 => 20);
+      }
+
+      cp3: coverpoint signal3 iff (enable) {
+        bins explicit_bins = {64, 127};
+        bins transition_bins = (32 => 64 => 127);
+      }
+
+      cp4: coverpoint enable {
+        bins explicit_bins = {0, 1};
+      }
+
+      cp5: coverpoint signal1 iff (enable) {
+        bins explicit_bins = {1, 15};
+        bins transition_bins = (2 => 7 => 15);
+      }
+    endgroup
+
+    // Covergroup 2
+    covergroup cg2 @(posedge clk);
+      option.name = "Covergroup2";
+      option.per_instance = 1;
+      option.weight = 3;
+      option.goal = 100;
+      option.at_least = 1;
+      option.auto_bin_max = 500;
+
+      cp1: coverpoint signal1 iff (enable) {
+        bins explicit_bins = {3, 6};
+        bins transition_bins = (1 => 3 => 6);
+      }
+
+      cp2: coverpoint signal2 iff (enable) {
+        bins explicit_bins = {15, 30};
+        bins transition_bins = (10 => 15 => 30);
+      }
+
+      cp3: coverpoint signal3 iff (enable) {
+        bins explicit_bins = {32, 96};
+        bins transition_bins = (16 => 32 => 96);
+      }
+
+      cp4: coverpoint enable {
+        bins explicit_bins = {0, 1};
+      }
+
+      cp5: coverpoint signal2 iff (enable) {
+        bins explicit_bins = {25, 50};
+        bins transition_bins = (20 => 25 => 50);
+      }
+    endgroup
+
+    // Constructor to initialize covergroups
+    function new();
+      cg1 = new();
+      cg2 = new();
+    endfunction
+  endclass
+
+  // Create an instance of the class
+  CoverGroup cg_inst;
+
+  initial begin
+    // Instantiate the class
+    cg_inst = new();
+
+    // Dumpfile for waveform
+    $dumpfile("dump.vcd");
+    $dumpvars;
+
+    // Randomize and sample covergroups
+    repeat (400) begin
+      @(posedge clk);
+      if (cg_inst.randomize()) begin
+        cg_inst.cg1.sample();
+        cg_inst.cg2.sample();
+      end 
+    end
+
+    // Display coverage for Covergroup 1
+    $display("Coverage for Covergroup 1:");
+    $display("Overall Coverage = %0f%%", cg_inst.cg1.get_coverage());
+
+    // Display coverage for Covergroup 2
+    $display("Coverage for Covergroup 2:");
+    $display("Overall Coverage = %0f%%", cg_inst.cg2.get_coverage());
+
+    #500;
+    $finish;
+  end
+endmodule

@@ -1,0 +1,39 @@
+polymorphism
+class base;
+  int a;
+  virtual function void display(); //we can acess child class properties by parent class
+    $display("base");
+  endfunction
+endclass
+class child1 extends base;
+  int b;
+  function void display();
+    $display("child1");
+  endfunction
+endclass
+class child2 extends child1;
+  int c;
+  function void display();
+    $display("child2");
+  endfunction
+endclass
+module tb;
+  base x;
+  child1 y;
+  child2 z;
+  initial begin
+    x=new();
+    y=new();
+    z=new();
+    $cast(x,y);
+   x.display;
+   y.display;
+  z.display;
+    $display("--------");
+    y=z;
+    x=y;   
+  y.display;
+  z.display;
+     x.display;    
+      end
+endmodule

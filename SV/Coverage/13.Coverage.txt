@@ -1,0 +1,63 @@
+// Code your testbench here
+class coverGroup;
+  typedef enum logic [1:0] {
+  WINTER=2'b00,
+  SUMMER=2'b01,
+  RAINY=2'b10
+  } season_t;
+  typedef enum logic [1:0] {
+  WOOLEN_COAT=2'b00,
+  COTTON_TOP=2'b01,
+  RAINY_COAT=2'b10
+  } clothes_t;
+  rand season_t season;
+  rand clothes_t clothes;
+  covergroup cg @(season,clothes);
+    cp_season: coverpoint season{
+      bins winter_bin={WINTER};
+      bins summer_bin={SUMMER};
+      bins rainy_bin={RAINY};
+    }
+   cp_clothes: coverpoint clothes{
+     bins woolen_coat_bin={WOOLEN_COAT};
+     bins cotton_top_bin={COTTON_TOP};
+     bins rainy_coat_bin={RAINY_COAT};
+    ignore_bins ignore_rainy_with_woolen_coat={RAINY_COAT};
+    illegal_bins illegal_combination={WOOLEN_COAT,RAINY_COAT};
+    }
+    
+    coss_cp_season_clothes:cross cp_season,cp_clothes;
+  endgroup
+  function new();
+    cg=new();
+  endfunction
+  function void randomize_values();
+    if(!this.randomize())
+      begin
+        $display("Randomization failed");
+      end
+  endfunction
+   // Sample the coverage group
+  task sample_coverage();
+    cg.sample();
+  endtask
+  // Print coverage
+  task print_coverage();
+    $display("Total Coverage: %0.2f%%", cg.get_coverage());
+  endtask
+endclass
+module tb;
+  coverGroup cov;
+  initial begin
+    cov=new();
+    repeat(10)
+      begin
+        cov.randomize_values();
+        $display("Randomize values:season =%0d,clothes=%0d",cov.season,cov.clothes);
+        cov.sample_coverage();
+      end
+    cov.print_coverage();
+    $finish;
+  end
+endmodule
+    

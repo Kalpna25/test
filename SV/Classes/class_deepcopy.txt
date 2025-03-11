@@ -1,0 +1,35 @@
+// Deep copy
+class packet1;
+  int A;
+  function packet1 copy;
+    copy=new();
+    copy.A=A;
+    return copy;
+  endfunction
+endclass
+class packet2;
+  packet1 pkt;
+  int B;
+  function new();
+    pkt=new();
+    endfunction
+  function packet2 copy();
+    copy=new();
+    copy.B=this.B;
+    copy.pkt=this.pkt;
+    return copy;
+  endfunction
+endclass
+module tb;
+  packet2 P1,P2;
+  initial begin
+    P1=new();
+    P1.B=30;
+    P1.pkt.A=50;    $display("P1.B:%0d,P1.pkt.A:%0d",P1.B,P1.pkt.A);
+    P2=P1.copy;
+$display("P1.B:%0d,P1.pkt.A:%0d",P1.B,P1.pkt.A);   $display("P2.B:%0d,P2.pkt.A:%0d",P2.B,P2.pkt.A);
+    P2.B=15;
+    P2.pkt.A=25;   
+$display("P1.B:%0d,P1.pkt.A:%0d",P1.B,P1.pkt.A);    $display("P2.B:%0d,P2.pkt.A:%0d",P2.B,P2.pkt.A);
+  end
+endmodule

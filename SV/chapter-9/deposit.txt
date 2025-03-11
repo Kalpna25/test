@@ -1,0 +1,26 @@
+module tb;
+  reg [7:0] my_var[0:15]; // Declare a memory array
+
+  initial begin
+    for (int i = 0; i < 16; i++) begin
+      my_var[i] = i; 
+    end
+
+    $display("Initial variable in memory:");
+    for (int i = 0; i < 16; i++) begin
+      $display("my_var[%0d]: %0d", i, my_var[i]);
+    end
+    #5;
+    $deposit(my_var[3], 8'haa);
+    $deposit(my_var[4], 8'hcf);
+    $deposit(my_var[14], 8'hab);
+    $display("Variable in memory after $deposit:");
+    for (int i = 0; i < 16; i++) begin
+      $display("my_var[%0d]: %0d", i, my_var[i]);
+    end
+
+    #5; 
+    $finish; 
+  end
+endmodule
+

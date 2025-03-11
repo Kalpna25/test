@@ -1,0 +1,25 @@
+// basic class code
+class A;
+  int a;
+  int b;
+  int c;
+  function new(int x,y,z);
+    a=x;
+    b=y;
+    c=z;
+  endfunction
+  function void display();
+    $display("a:%0d, b:%0d,c:%0d",a,b,c);
+  endfunction
+endclass
+module tb;
+  A a1,a2;
+  initial
+    begin
+      a1=new(10,15,20);
+      a2=new(25,30,35);
+      a1.display;
+      a2.display;
+    end 
+endmodule
+  

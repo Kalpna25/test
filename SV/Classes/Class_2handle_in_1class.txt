@@ -1,0 +1,31 @@
+class packet1;
+  int data;
+  string address;
+  
+  // Constructor with parameters
+  function new(int data, string address);
+    this.data = data;
+    this.address = address;
+  endfunction
+  
+  // Method to display packet details
+  function void display();
+    $display("data: %0d, address: %0s", data, address);
+  endfunction
+endclass
+
+module tb;
+  // Declare packet objects
+  packet1 pkt1, pkt2;
+
+  initial begin
+    pkt1 = new(15, "delhi");  
+    pkt2 = new(0,"");        
+
+    pkt1.display(); 
+
+    pkt2.data = pkt1.data;
+    pkt2.address = pkt1.address;
+    pkt2.display();
+  end
+endmodule

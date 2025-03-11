@@ -1,0 +1,27 @@
+module tb;
+  mailbox mb;
+  string s;int i;
+  initial begin
+    mb=new();
+    $monitor("s=%0s and i=%0d at time=%0t",s,i,$time);
+    fork gen_data;
+      rect_data;
+    join
+  end
+  task gen_data;
+    mb.put("Hello");
+    #3 mb.put(7);
+    #4 mb.put("kalpna");
+    #3 mb.put(5);
+    #9 mb.put("choudhar");
+    #2 mb.put(6);
+  endtask
+  task rect_data;
+    #1 mb.peek(s);
+    #2 mb.get(s);
+    #2 mb.get(i);
+    #1 mb.peek(s);
+    #4 mb.get(s);
+    #2 mb.get(i);
+  endtask
+endmodule

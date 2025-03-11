@@ -1,0 +1,47 @@
+// Code your testbench here
+// or browse Examples
+class Parent;
+    int a;
+  function new(int a);
+        this.a = a;
+    endfunction
+    function void display();
+      $display("Parent variable: %0d", a);
+    endfunction
+endclass
+
+class Child extends Parent;
+    int b;
+  function new(int b);
+    super.new(a);
+        this.b = b;
+    endfunction
+    function void display();
+        super.display();
+      $display("Child variable: %0d", b);
+    endfunction
+endclass
+
+module tb;
+    Parent p;
+    Child ch;
+    initial begin
+        p = new(10);
+        ch = new(30);
+
+        // Using $cast as a function
+      if ($cast(p, ch))
+        $display("Dynamic cast successful using function");
+        else
+        $display("Dynamic cast failed using function");
+
+        // Using $cast as a task
+        begin
+          automatic Child c_casted;
+       if ($cast(p, c_casted))
+          $display("Dynamic cast successful using task");
+            else
+          $display("Dynamic cast failed using task");
+        end
+    end
+endmodule

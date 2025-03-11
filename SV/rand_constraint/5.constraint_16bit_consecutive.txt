@@ -1,0 +1,14 @@
+class addr_class;
+  rand bit [15:0] addr;
+  constraint c1 {!(&addr[15:0] & (addr[15:0] >> 1));}
+  endclass
+
+module tb;
+  addr_class obj;
+
+  initial begin
+    obj = new();
+    if(obj.randomize())
+      $display("addr:%0h",obj.addr);
+  end
+endmodule

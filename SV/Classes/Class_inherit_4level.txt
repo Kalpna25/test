@@ -1,0 +1,54 @@
+// Parent class
+class parent;
+    int A;                     //property
+  function void display();  //method
+        $display("A: %0d", A);
+    endfunction
+endclass
+
+// Child1 class (inherits from parent)
+class child1 extends parent;
+    int B;                      //property
+  function void display(); //method
+        $display("B: %0d", B);
+    endfunction
+endclass
+
+// Child2 class (inherits from child1)
+class child2 extends child1;
+    int C;                     //property
+  function void display(); //method
+        $display("C: %0d", C);
+    endfunction
+endclass
+
+// Child3 class (inherits from child2)
+class child3 extends child2;
+    string D;                     //property
+  function void display(); //method
+        $display("D: %0s", D);
+    endfunction
+endclass
+
+module tb;
+    parent p;
+    child1 c1;
+    child2 c2;
+    child3 c3;
+    
+    initial begin
+        p = new();          
+        c1 = new();   
+        c2 = new(); 
+        c3 = new(); 
+        p.A=10;
+      c1.B=20;
+      c2.C=30;
+      c3.D="Aarna";
+       
+        p.display();
+        c1.display();
+        c2.display();
+        c3.display();
+    end
+endmodule

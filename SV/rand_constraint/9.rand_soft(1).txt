@@ -1,0 +1,15 @@
+class constraint_soft;
+  rand int a;
+  constraint c1{soft a<50;a>10;}
+endclass
+module tb;
+constraint_soft a1; 
+  initial begin
+    a1=new();
+    repeat(10) begin
+      if(a1.randomize() with {a>60;a<100;})
+        $display("a1.a=%0d",a1.a);
+    end
+  end
+endmodule
+    

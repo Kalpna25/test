@@ -1,0 +1,54 @@
+class my_class;
+   task thread1();
+    $display("[Thread1] Started at time: %0t", $time);
+    #5; 
+    $display("[Thread1] Completed at time: %0t", $time);
+  endtask
+
+   task thread2();
+    $display("[Thread2] Started at time: %0t", $time);
+    #10; 
+    $display("[Thread2] Completed at time: %0t", $time);
+  endtask
+task thread3();
+  $display("[Thread3] Started at time: %0t", $time);
+    #10; 
+  $display("[Thread3] Completed at time: %0t", $time);
+  endtask
+task thread4();
+  $display("[Thread4] Started at time: %0t", $time);
+    #10; 
+  $display("[Thread4] Completed at time: %0t", $time);
+  endtask
+
+   task run();
+    $display("Starting threads in class TaskManager at time: %0t", $time);
+
+    fork
+      thread1(); 
+      thread2(); 
+    join 
+     disable fork;
+       $display("disabled fork at time: %0t", $time);
+       fork
+      thread3(); 
+      thread4(); 
+    join 
+     #7;
+    disable thread3;  // This will stop job3 from running
+       $display("thread3 is disabled at time: %0t", $time);
+     $display("All threads completed at time: %0t", $time);
+  endtask
+endclass
+
+module tb;
+  my_class m;
+
+  initial begin
+     m = new();
+    m.run();
+
+    $display("Simulation completed.");
+    $finish;
+  end
+endmodule

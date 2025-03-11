@@ -1,0 +1,29 @@
+// class_constructor
+class car;
+// Class variables
+string model;
+int year;
+
+// Constructor
+  function new(string model_name = "Honda", int manufacture_year = 2000);
+model = model_name;
+year = manufacture_year;
+endfunction
+
+// Method to display car details
+function void display();
+  $display("Car Model: %0s, Year: %0d", model, year);
+endfunction
+endclass
+
+module test;
+// Declare a car object
+car mycar1;
+
+initial begin
+// Create an object with default constructor
+mycar1 = new();
+mycar1.display();
+
+end
+endmodule

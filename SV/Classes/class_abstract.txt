@@ -1,0 +1,36 @@
+virtual class base;
+ virtual task display();
+    $display("base");
+ endtask
+  function int add(int a);
+    a++;
+    return a;
+  endfunction
+endclass
+class child1 extends base;
+  int b;
+  function int add(int b);
+    b=b+1;
+    return b;
+  endfunction
+endclass
+module tb;
+  base x;
+  child1 y;
+  int p1;
+   initial begin
+      y=new();
+     p1=y.add(5);
+     $display(p1);
+     x=y;
+     x.display;
+     p1=y.add(6);
+     $display(p1);
+     x=y;
+     x.display;
+        end
+endmodule
+   
+  
+
+  

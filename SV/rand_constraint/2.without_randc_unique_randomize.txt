@@ -1,0 +1,22 @@
+module unique_generat;
+  integer a [9:0];
+   integer i,temp,ran,index=0;
+  initial begin
+    $monitor("ran=%0d",ran);
+    while(index!=10) begin 
+      temp={$random}%100;
+      begin:loop
+        for(i=0;i<index;i=i+1)
+          if(a[i]==temp)
+            disable loop;
+            a[index]=temp;
+        index=index+1;
+        ran=temp;
+        #2;
+      end
+    end
+     
+  end
+      endmodule
+            
+     

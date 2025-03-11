@@ -1,0 +1,65 @@
+module Repetition_cov;
+  bit [9:0] signal; 
+  bit clk;          
+
+  initial clk = 0;
+  always #25 clk = ~clk;
+
+  class Rep_Cov;
+     covergroup cg @(posedge clk);
+      option.name = "10_Bit_Signal_covergroup";
+      option.per_instance = 1;
+      option.weight = 5;
+      option.goal = 100;
+      option.at_least = 1;
+      option.auto_bin_max = 500;
+
+      cp_consecutive: coverpoint signal {
+        bins consecutive_1 = (1[*2]); 
+//         bins consecutive_2 = (4[*3]); 
+          
+      }
+
+      cp_goto: coverpoint signal {
+        bins goto_2 = (1[->2]); 
+        bins goto_3 = (4[->3]); 
+      }
+
+      cp_nonconsecutive: coverpoint signal {
+        bins nonconsecutive_2 = (1[=2]); 
+        bins nonconsecutive_3 = (4[=3]); 
+      }
+    endgroup
+
+    function new();
+      cg = new();
+    endfunction
+
+    function void sample();
+      cg.sample();
+    endfunction
+
+    function void display_coverage();
+      $display("Coverage Results:");
+      $display("Overall Coverage = %0f%%", cg.get_coverage());
+      $display("Consecutive Repetitions Coverage = %0f%%", cg.cp_consecutive.get_coverage());
+       $display("Goto Repetition = %0f%%", cg.cp_goto.get_coverage());
+      $display("Nonconsecutive Repetitions Coverage = %0f%%", cg.cp_nonconsecutive.get_coverage());
+    endfunction
+  endclass
+
+  Rep_Cov Rcov;
+
+  initial begin
+    Rcov = new();
+   repeat (500) begin
+      @(posedge clk);
+      signal = $urandom % 1024; 
+      Rcov.sample();           
+    end
+   Rcov.display_coverage();
+
+    #100;
+    $finish;
+  end
+endmodule

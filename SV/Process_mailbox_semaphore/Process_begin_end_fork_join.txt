@@ -1,0 +1,50 @@
+module fork_join;
+  reg a;
+  initial begin
+     #35 $display($time," simulation time 35");
+ fork
+   begin
+   #10 $display($time,"simulation time 10");
+   fork
+     #20 $display($time,"simulation time 20");
+     begin
+     #30 $display($time,"simulation time 30");
+     #40 $display($time,"simulation time 40");
+     end
+     #5 $display($time,"simulation time 5");
+   join 
+   end
+     begin
+   #5 $display($time,"simulation time 5");
+   #20 $display($time,"simulation time 20");
+     end
+     fork
+   #50 $display($time,"simulation time 50");
+      fork
+        #10 $display($time,"simulation time 10");
+        #15 $display($time,"simulation time 15");
+ join
+     join
+        #25 $display($time,"simulation time 25");
+     fork
+        #50 $display($time,"simulation time 50");
+      begin
+            #20 $display($time,"simulation time 20");
+            #10 $display($time,"simulation time 10");
+      end
+              fork
+                #30 $display($time,"simulation time 30");
+                #35 $display($time,"simulation time 35");
+              join
+     join
+       
+     join
+  end
+  endmodule
+    
+
+    
+
+    
+
+    

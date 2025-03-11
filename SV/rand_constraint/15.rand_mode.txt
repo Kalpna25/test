@@ -1,0 +1,32 @@
+class my_class;
+  rand bit [7:0] a,b,c;
+  constraint c1 { a <10;}
+  constraint c2 { b <20;}
+  constraint c3 { c <60;}
+  endclass
+
+module tb;
+  my_class m;
+  initial begin
+    m = new();
+    $display("Randomize all");
+    repeat(5)
+      if(m.randomize() with {a==5;b==11;c==35;})
+      $display("a = %d b=%d c=%d", m.a,m.b,m.c);
+        m.a.rand_mode(0);
+        m.b.rand_mode(0);
+        m.c.rand_mode(0);
+     $display("randomization is failed");
+   repeat(5)
+     if(m.randomize() with {a==5;b==11;c==35;})
+    $display("a = %d b=%d c=%d", m.a,m.b,m.c);
+    m.a.rand_mode(1);
+    m.b.rand_mode(0);
+    m.c.rand_mode(1);
+    $display("randomize only a and c");
+  repeat(5)
+  if(m.randomize)
+    $display("a = %d b=%d c=%d", m.a,m.b,m.c);  
+    
+  end
+endmodule

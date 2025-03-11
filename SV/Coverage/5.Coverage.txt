@@ -1,0 +1,63 @@
+module CoverGroup;
+  // Declare signals
+  bit clk;
+  bit [5:0] data;
+
+  // Clock generation (50ns period)
+  initial clk = 0;
+  always #25 clk = ~clk;
+
+    // Covergroup 1
+    covergroup cg1 @(posedge clk);
+      option.name = "Covergroup1";
+      option.per_instance = 1;
+      option.weight = 3;
+      option.goal = 100;
+      option.at_least = 1;
+      option.auto_bin_max = 500;
+
+      cp_bins1: coverpoint data {
+        bins sequence1 = {4, 16, 21, 7, 1, 31, 14, 5};
+      }
+      
+      cp_bins2: coverpoint data {
+        bins sequence2 = {6, 26, 11, 2, 1, 7, 10, 3, 15, 5};
+      }
+          cp_bins3: coverpoint data {
+        bins sequence3 = {[0:15]};
+      }
+
+      cp_bins4: coverpoint data {
+        bins sequence4 = {[0:11], [13:15], [17:19], [21:23], [25:27], [29:31]};
+      }
+      
+    endgroup
+   cg1 cg_inst;
+
+  initial begin
+    // Instantiate the covergroup
+    cg_inst = new();
+
+    // Dumpfile for waveform
+    $dumpfile("dump.vcd");
+    $dumpvars;
+
+    // Stimulus generation to hit all bins
+    repeat (100) begin
+      @(posedge clk);
+      data = $urandom % 32; // Random values within the 6-bit range
+      cg_inst.sample(); // Sample covergroup 1
+    end
+
+    // Display coverage for Covergroup 1
+$display("Coverage for Covergroup 1:");
+    $display("Overall Coverage = %0f%%", cg_inst.get_coverage());
+    $display("Coverage for sequence1 = %0f%%", cg_inst.cp_bins1.get_coverage());
+    $display("Coverage for sequence2 = %0f%%", cg_inst.cp_bins2.get_coverage());
+    $display("Coverage for sequence3 = %0f%%", cg_inst.cp_bins3.get_coverage());
+    $display("Coverage for sequence4 = %0f%%", cg_inst.cp_bins4.get_coverage());
+
+    #100;
+    $finish;
+  end
+endmodule

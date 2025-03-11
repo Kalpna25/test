@@ -1,0 +1,18 @@
+class packet1;
+  rand int data1,data2;
+  constraint c1{data1 dist{0:=40,[1:4]:=60,[6:7]:=20};} 
+  constraint c2{data2 dist{0:/40,[1:4]:/60,[6:7]:/20};}
+  endclass
+module tb;
+  packet1 p;
+  initial begin
+    p=new();
+    repeat(50)
+      begin
+      if(p.randomize)
+        $display("data1: %0d, data2: %0d", p.data1, p.data2);
+      end
+      end
+      endmodule
+      
+      

@@ -1,0 +1,8 @@
+#!/use/bin/perl
+print "integer value(0-127)\n";
+for($i=0;$i<=127;$i=$i+1)
+{
+printf ("%d = %c \t \n",$i,$i);
+}
+
+

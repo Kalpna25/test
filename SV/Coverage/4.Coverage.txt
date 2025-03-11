@@ -1,0 +1,58 @@
+module covergroup_example;
+  // Declare a 12-bit signal
+  bit [11:0] data;
+
+  // Clock signal
+  bit clk;
+
+  // Clock generation (50ns period)
+  initial clk = 0;
+  always #25 clk = ~clk;
+
+  // Covergroup definition
+  covergroup cg_data @(posedge clk);
+    option.name = "Data_Coverage";
+    option.per_instance = 1;
+    option.weight = 3;
+    option.goal = 100;
+    option.at_least = 1;
+    option.auto_bin_max = 500;
+
+    // Explicit bins using all possible methods
+    cp_data: coverpoint data {
+      bins exact_values = {0, 1023, 2047, 4095};    // Specific values
+      bins ranges = {[0:1023], [1024:2047]};         // Ranges
+      bins mixed = {0, [1000:2000], 3000, 4095};    // Mixed values and ranges
+      bins array[] = {[0:500], [501:1000], [1001:1500], [1501:4095]}; // Auto bins
+    }
+  endgroup
+
+  // Instantiate the covergroup
+  cg_data cg_inst = new();
+
+  // Testbench
+  initial begin
+    $dumpfile("dump.vcd");
+    $dumpvars;
+
+    // Stimulus generation to hit all bins
+    repeat (20) begin
+      @(posedge clk);
+      case ($urandom % 4)
+        0: data = 0;                 // Exact value
+        1: data = $urandom % 1024;   // Range [0:1023]
+        2: data = 1500 + $urandom % 500; // Range [1501:2000]
+        3: data = 4095;              // Exact value
+        default: data = $urandom % 4096; // Random
+      endcase
+      cg_inst.sample(); // Sample the covergroup
+      $display("[%0t] data = %0d", $time, data);
+    end
+
+    // Display coverage metrics
+    $display("Overall Coverage = %0f%%", cg_inst.get_coverage());
+    $display("Data Coverage = %0f%%", cg_inst.cp_data.get_coverage());
+    #100;
+    $finish;
+  end
+endmodule

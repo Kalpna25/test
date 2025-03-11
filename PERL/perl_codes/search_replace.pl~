@@ -1,0 +1,13 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+my $a="my name is kalpna";
+print "$a\n";
+if($a=~ m{kalpna})
+{
+print "name is matched\n";
+}
+else
+{
+print "name is not matched\n";
+}

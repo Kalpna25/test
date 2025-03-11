@@ -1,0 +1,25 @@
+// normal code for access parent class and child class 
+class A;
+  int a;
+  function new(int x);
+    a = x;
+  endfunction
+endclass
+class B;
+  int b;
+  function new(int x);
+    b = x;
+  endfunction
+endclass
+module tb;
+A a1,a2;
+B b1,b2;
+initial begin
+  a1=new(10);
+  a2=new(20);
+  b1=new(5);
+  b2=new(15); 
+  $display("a1.a=%d, a2.a=%d", a1.a, a2.a);
+  $display("b1.b=%d, b2.b=%d", b1.b, b2.b);
+  end
+endmodule

@@ -1,0 +1,18 @@
+class packet1;
+  rand int array;
+  constraint c1{array inside{[1:10],15,20,30};}
+  function void pre_randomize;
+    $display("packet1:pre_randomize");
+  endfunction
+endclass
+module tb;
+  packet1 p;
+  initial begin
+    p=new();
+    repeat(10)
+      if(p.randomize)
+        $display(p.array);
+      end
+      endmodule
+      
+      

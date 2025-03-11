@@ -1,0 +1,19 @@
+/*3. Write class  with 2 local properties.
+       From test case how can I drive the values to these properties. */
+class base;
+  local int a;
+  local int b;
+  function new(int c,d);
+    this.a=c;
+    this.b=d;
+    $display("a=%0d b=%0d",a,b);
+  endfunction
+endclass
+module tb;
+  base b1;
+  initial begin
+    b1=new(6,5);
+   end
+endmodule
+    
+    

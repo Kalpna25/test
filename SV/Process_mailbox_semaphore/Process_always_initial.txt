@@ -1,0 +1,48 @@
+module tb;
+  logic [7:0] a,b,c;
+  logic[7:0]d;
+  logic clk;
+  initial begin
+    a=8'b1000_1100;
+    b=8'b1100_1010;
+    c=8'b1011_1001;
+    d=a+b+c;
+    $display("time=%0t: d=%b",$time,d);
+  end
+  initial begin
+    a=10;
+    b=15;
+    c=20;
+    d=a+b+c;
+  $display("time=%0t: d=%b",$time,d);
+  end
+  initial 
+    clk=0;
+    always #5 clk=~clk;
+       
+  always@(posedge clk)
+    begin
+      a<=a+1;
+      $display("time=%0t: a=%d",$time,a);
+    end
+  always@(negedge clk)
+    begin
+      b<=b+1;
+      $display("time=%0t: b=%0d",$time,b);
+    end
+  always @(a,b,c)
+    begin
+      d=a+b+c;
+      $display("time=%0t: d=%d",$time,d);
+    end
+  always @(posedge clk) begin
+  $display("Time = %0t: clk = %0b, a = %0d, b = %0d, c = %0d, d = %0d", $time, clk, a, b, c, d);
+    clk=0;
+  end
+  initial begin
+    #100;
+    $display("simulation ended");
+    $finish;
+  end
+endmodule
+

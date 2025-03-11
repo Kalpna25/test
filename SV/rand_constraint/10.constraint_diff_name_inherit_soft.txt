@@ -1,0 +1,44 @@
+// Base class
+class base_class;
+  rand bit [7:0] a, b;
+  constraint base_c1 { a < 50; }
+  constraint base_c2 { b > 20 && b < 100; }
+
+  function void display();
+    $display("a = %0d, b = %0d", a, b);
+  endfunction
+endclass
+
+// Derived class
+class derived_class extends base_class;
+  rand bit [7:0] c;
+  constraint derived_c1 { c > 30; }
+  constraint derived_c2 {soft c < 75; }
+
+  function void display();
+    super.display();
+    $display("c = %0d", c);
+  endfunction
+endclass
+
+// Testbench
+module tb;
+  derived_class d;
+
+  initial begin
+    d = new();
+    if (d.randomize()) 
+      begin
+      d.display();
+    end 
+  
+      if (d.randomize() with { c >= 90; }) 
+        begin
+      d.display();
+    end 
+    if (d.randomize() with { c <60; }) 
+      begin
+      d.display();
+    end 
+  end
+endmodule

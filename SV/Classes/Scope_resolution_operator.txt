@@ -1,0 +1,20 @@
+class eth_pkt;
+bit[7:0]sof;
+bit[15:0]len;
+func􀆟on void print();
+$display("scope resolu􀆟on");
+endfunc􀆟on
+class m_pkt;
+sta􀆟c int a=5;
+func􀆟on new;
+m_pkt::a=5;
+endfunc􀆟on
+endclass
+endclass
+module scope_tb;
+eth_pkt e1;
+ini􀆟al begin
+e1=new;
+$display("m_pkt class a=%0d",eth_pkt::m_pkt::a);
+end
+endmodule

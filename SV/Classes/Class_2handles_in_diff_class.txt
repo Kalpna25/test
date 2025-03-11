@@ -1,0 +1,48 @@
+class packet1;
+  int A, B;
+    function new(int A, B);
+    this.A = A;
+    this.B = B;
+  endfunction
+  function int multi(int A, B);
+    return (A * B);
+  endfunction
+  function void display();
+    $display("A: %0d, B: %0d", A, B);
+  endfunction
+endclass
+
+class packet2;
+  int C, D;
+  function new(int C, D);
+    this.C = C;
+    this.D = D;
+  endfunction
+
+   function int add(int C, D);
+    return (C + D);
+  endfunction
+
+   function void display();
+    $display("C: %0d, D: %0d", C, D); 
+  endfunction
+endclass
+
+module tb;
+  packet1 pkt1;
+  packet2 pkt2;  
+  int result1, result2;  
+
+  initial begin
+    pkt1 = new(10, 20);  
+    pkt2 = new(25, 35);
+    result1 = pkt1.multi(pkt1.A, pkt1.B);  
+    $display("Result1: %0d", result1);
+    pkt1.display(); 
+
+    result2 = pkt2.add(pkt2.C, pkt2.D);  
+    $display("Result2: %0d", result2);
+
+    pkt2.display();
+  end
+endmodule

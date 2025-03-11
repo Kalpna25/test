@@ -1,0 +1,19 @@
+module tb;
+semaphore smp;
+int got=0;
+initial begin
+  smp=new(5);
+  #5 smp.get(3);
+             #6 smp.get(1);
+             got=got+1;
+             #2 if(smp.try_get(3))
+               got=got+1;
+             end
+             initial begin
+               #8 smp.get(2);
+               #7 smp.put(2);
+             end
+  initial begin
+    $monitor("time=%0t: got=%0d",$time,got);
+  end
+endmodule

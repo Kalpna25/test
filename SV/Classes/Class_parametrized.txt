@@ -1,0 +1,29 @@
+class top #(num=10, type dtype=bit);
+dtype data[num];
+function void packet();
+foreach (data[i])
+  data[i] = $urandom_range(2,15);
+endfunction
+
+function void display();
+foreach (data[i])
+$display("data=[%0d]=%0d", i, data[i]);
+endfunction
+endclass
+module parametrized_tb;
+top#(10) t1;
+top#(20,byte)t2;
+
+
+initial begin
+t1=new();
+t2=new();
+
+t1.display;
+t1.packet;
+t2.packet;
+t2.display;
+
+end
+endmodule
+

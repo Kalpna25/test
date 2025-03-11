@@ -1,0 +1,43 @@
+// Code your testbench here
+class parent;
+  rand bit[2:0]a[];
+  rand bit[2:0]b[];
+  constraint c1{
+    a.size==5;
+    b.size==5;
+    foreach(a[i]) a[i] inside{[0:7]}; 
+    foreach(b[i]) b[i] inside{[0:7]};
+  }
+  function void display();
+    $display("Parent randomize a:%p b:%p",a,b);
+  endfunction
+endclass
+  class child extends parent;
+    rand bit[2:0]c[];
+    rand bit[2:0]e[];
+    rand parent p;
+    constraint c2{
+    c.size==5;
+    e.size==5;
+      foreach(c[i]) c[i] inside{[0:7]}; 
+      foreach(e[i]) e[i] inside{[0:7]};
+  }
+    function new();
+      p=new();
+    endfunction
+    function void display();
+      $display("Child randomize c:%p e:%p",c,e);
+      p.display;
+    endfunction
+  endclass
+  module tb;
+     child ch;
+    initial begin
+       ch=new();
+      repeat(5) begin
+        if(ch.randomize)
+      ch.display();
+      
+    end
+    end
+  endmodule

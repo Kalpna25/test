@@ -1,0 +1,48 @@
+module tb;
+logic clk;
+logic rst;
+logic en;
+logic [3:0] in;
+logic [3:0] out;
+logic [3:0] comb_out;
+logic [3:0] latch_out;
+   always #5 clk=~clk;
+  initial begin
+  $monitor("Time=%0t, clk=%0b,rst=%0b,en=%0b,in=%0b,out=%0b,comb_out=%0b,latch_out=%0b",$time,clk,rst,en,in,out,comb_out,latch_out);
+   clk=0; rst=1;en=0;in=4'b0000;
+    #10 rst=0;
+    #10 en=1; in=4'b0101;
+    #10 in=4'b1010;
+    #10 en=0;
+    #10 in=4'b1111;
+    #10 $finish;
+  end
+  always_ff@(posedge clk or posedge rst)
+    begin
+      if(rst)
+        begin
+          out<=4'b0000;
+        end
+          else if(en)
+            begin
+            out<=in;
+        end
+    end
+      always_comb 
+        begin
+          if(!en) begin
+            comb_out<=4'b0000;
+          end
+          else begin
+            comb_out<=in+1;
+          end
+        end
+          always_latch 
+            begin
+            if(en) begin
+              latch_out=in;
+          end
+            end
+               
+          endmodule
+          

@@ -1,0 +1,18 @@
+class object;
+  rand bit [31:0] address;
+  constraint c { address[9:0] != 10'b0000000000;}
+  function void display();
+    $display("Generated Address: %h", address);
+  endfunction
+endclass
+module tb;
+object obj;
+ initial begin
+obj = new();
+   repeat(3)
+    if (obj.randomize()) begin
+      obj.display();
+    end 
+  end
+
+endmodule

@@ -1,0 +1,38 @@
+//class_constructor
+class Car;
+string model;
+int year;
+
+// Constructor
+function new(string model_name = "Unknown", int manufacture_year = 2000);
+model = model_name;
+year = manufacture_year;
+endfunction
+
+// Method to display car details
+function void display();
+$display("Car Model: %s, Year: %d", model, year);
+endfunction
+endclass
+
+module test;
+// Declare a Car object
+Car myCar;
+
+initial begin
+// Null assignment
+myCar = null;  // myCar does not reference any object
+
+// Checking if the object is null before using it
+if (myCar == null) begin
+$display("myCar is null, no object to display.");
+end
+  else 
+    begin
+    myCar.display();
+        end
+// Assign an actual object to the reference
+    myCar = new("Honda", 2021);
+    myCar.display();
+    end
+endmodule

@@ -1,0 +1,54 @@
+module covergroup_samp;
+  bit [9:0] data1;
+  bit [9:0] data2;
+  bit clk;
+
+  // Clock generation
+  initial clk = 0;
+  always #25 clk = ~clk;
+
+  // Covergroup definition
+  covergroup my_cg @(posedge clk);
+    option.name = "Data_coverpoint"; 
+    option.weight = 2;
+    option.goal = 200;
+    option.at_least = 1;
+    option.auto_bin_max = 500;
+    option.per_instance = 1;
+
+    cp_data1: coverpoint data1 {
+      bins a1 = {5, 6, 7, 8, 3};
+      bins a2 = {[9:22], [23:32]};
+      bins a3[] = {[32:43], 44, 45, [46:55]};
+    }
+    
+    cp_data2: coverpoint data2 {
+      bins b1 = {[56:65], [70:200]};
+      bins b2[] = {10, 11, 20, 25, 355, [425:550]};
+    }
+  endgroup
+
+  // Instantiate the covergroup
+  my_cg cg_inst = new();
+
+  // Testbench
+  initial begin
+    // Randomize and sample coverage
+    repeat (400) begin
+      for (int i = 0; i < 10; i++) begin
+      @(negedge clk);
+      data1 = $urandom % 1023; 
+      data2 = $urandom % 1023;    
+      $display("[%0t] data1 = %0d, data2 = %0d", $time, data1, data2);
+      end
+      cg_inst.sample();
+    end
+
+    // Display coverage
+    $display("Coverage = %0f %%", cg_inst.get_coverage());
+    $display("Coverage_data1 = %0f %%", cg_inst.cp_data1.get_coverage());
+    $display("Coverage_data2 = %0f %%", cg_inst.cp_data2.get_coverage());
+    #100;
+    $finish;
+  end
+endmodule

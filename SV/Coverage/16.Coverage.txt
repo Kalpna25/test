@@ -1,0 +1,213 @@
+/*
+write a coverage module for given design code. (download it from the given link) link: https://shorturl.at/9PiYL 
+1. Generate stimuls in class (observe the design and write constraints) and pump into the design (use interface here!!) (try to cover every condition in the design) 
+2. write coverpoints on each signal with explicit bins
+
+  3. write illegal bins in cross coverage on design responce (illeagal response condition from design is if addr is in [61:64]-> then err_rsp is 2'b11 and rdata is 32'hDEADBLEF
+
+4. write ignore bins on required signals.
+    (use of option.name,option_per_instance, option_weight,option_goal,option.at_least,option.auto_bin_max)
+    (no need to write monitor, driver, generator, scoreboard classes)
+    testbench- module 
+    rand variables-class
+    */
+module memory
+  //#( parameter ADDR_WIDTH = 2,
+     //parameter DATA_WIDTH = 8 ) 
+  (
+    input clk,
+    input reset,  
+    
+    //control signals
+    input [9:0]  addr,
+    input         wr_en,
+    input         rd_en,
+    
+    //data signals
+    input  [31:0] wdata,
+    output reg [31:0] rdata,
+	output reg [1:0] err_rsp
+  ); 
+  
+//   reg [31:0] rdata;// = 32'hFFFFFFFF;
+  
+  //Memory
+  reg [31:0] mem [61];
+
+  //Reset 
+  always @(posedge reset) 
+    begin //{
+	  err_rsp = 2'b00;
+      for(int i=0;i<61;i++) 
+        begin //{
+ 	      mem[i]=32'hFFFFFFFF;
+          rdata = 32'd0;
+          $display("mem[%0d]=%0h,error_rsp=%0d",i,mem[i],err_rsp);
+        end //}
+      $display("%0t, reset happened", $time);
+    end //}
+  
+  // Write data to Memory //Read data from memory
+  always @(posedge clk && !reset)
+    begin //{
+      if (addr inside {[0:60],[65:1023]} && wr_en)    
+        begin //{
+          if(addr inside {[65:1023]})
+          begin //{
+	        err_rsp = 2'b01;  //decode error
+            $display("decode error and error_rsp = %0d",err_rsp);
+          end //}
+		  else
+          begin //{
+            $display("%0t writing data", $time);
+            mem[addr] = wdata;
+			err_rsp = 2'b00;
+            $display("addr =%0d, wdata = %0h, error_rsp = %0d",addr,wdata,err_rsp);
+          end //}
+        end //}
+    end //}
+   always @(posedge clk && !reset)
+     begin //{
+       if (addr inside {[0:60],[65:1023]} && rd_en)
+        begin //{
+		  if(addr inside {[65:1023]})
+            begin //{
+	          err_rsp = 2'b10; //slave_err
+			  rdata = $urandom;
+              $display("slave error and error_rsp = %0d",err_rsp);
+            end //}
+			else
+              begin //{
+              $display("%0t, reading data", $time);
+              rdata = mem[addr];
+			  err_rsp = 2'b00;
+              $display("addr =%0d, rdata = %0h, error_rsp = %0d",addr,rdata,err_rsp);
+              end //}
+        end //}
+     end//}
+	always @(posedge clk && !reset)
+      begin //{
+		if(addr inside {[61:64]})
+          begin //{
+	      err_rsp = 2'b11; 		  //reserved error
+            $display("reserved error and error_rsp = %0d,addr = %0h",err_rsp,addr);
+		  if(rd_en)
+            begin //{
+		    rdata = 32'hDEADBEEF;
+            $display("reserved error addr =%0d, rdata = %0h, error_rsp = %0d",addr,rdata,err_rsp);
+            end //}
+          end //}
+    end //}  
+endmodule
+
+/// Interface for design inputs/outputs
+interface design_if();
+    logic clk;
+    logic reset;
+    logic [9:0] addr;
+    logic wr_en;
+    logic rd_en;
+    logic [31:0] wdata;
+    logic [31:0] rdata;
+    logic [1:0] err_rsp;
+endinterface
+
+// Stimulus Class
+class stimulus;
+    rand bit [9:0] addr;
+    rand bit wr_en;
+    rand bit rd_en;
+    rand bit [31:0] wdata;
+    bit [31:0] rdata;
+    bit [1:0] err_rsp;
+
+    // Constraints based on design behavior
+  constraint addr_c { addr inside {[0:1023]}; } 
+  constraint wr_rd_en_c { (wr_en == 1) ||(rd_en == 1); } 
+ 
+  // Coverage Group
+    covergroup cg;
+      option.name = "Cross_Coverage";
+      option.per_instance =1;
+      option.goal = 100;
+      option.weight = 2;
+      option.at_least=1;
+      option.auto_bin_max = 256;
+       // Address Coverage
+        addr_cp: coverpoint addr {
+            bins valid_addr = {[0:60]};
+            bins reserved_addr = {[61:64]};
+            bins invalid_addr = {[65:1023]};
+        }
+
+        // Write Enable Coverage
+        wr_en_cp: coverpoint wr_en {
+            bins write_enabled = {1};
+            bins write_disabled = {0};
+        }
+
+        // Read Enable Coverage
+        rd_en_cp: coverpoint rd_en {
+            bins read_enabled = {1};
+            bins read_disabled = {0};
+        }
+
+        // Write Data Coverage
+        wdata_cp: coverpoint wdata {
+          bins specific_values[] = {[32'h0000_0000:32'hFFFF_FFFF]};
+          ignore_bins ignore = {32'hABDF_EFDF};
+        }
+
+        // Cross Coverage
+        cross_wr_rd_en: cross wr_en,rd_en;
+        cross_addr_wr_en: cross addr_cp,wr_en_cp;
+        cross_addr_rd_en: cross addr_cp,rd_en_cp;
+        cross_addr_err: cross addr_cp,err_rsp,rdata{
+       illegal_bins illegal_addr_err=binsof(addr_cp) intersect {[61:64]} &&     binsof(err_rsp) intersect {2'b11} && binsof(rdata) intersect {32'hDEADBEEF};
+        }
+    endgroup
+  function new();
+    cg=new();
+  endfunction
+  function void sample();
+    cg.sample();
+  endfunction
+endclass
+module tb;
+  design_if dsg_if();
+  logic clk;
+  logic reset;
+  initial begin
+    clk=0;
+    forever #5 clk=~clk;
+  end
+  initial begin
+    reset=1;
+    #10 reset=0;
+  end
+  stimulus sti;
+  initial begin
+    sti=new();
+    repeat(400) begin
+      for(int i=0; i<10;i++) begin
+      if(sti.randomize())
+      dsg_if.addr = sti.addr;
+      dsg_if.wr_en = sti.wr_en;
+      dsg_if.rd_en = sti.rd_en;
+      dsg_if.wdata = sti.wdata;
+      @(posedge clk);
+      sti.sample;
+      end
+      $display("address:%0d,write_enable:%0b,read_enable:%0b,write_data=%0h",dsg_if.addr,dsg_if.wr_en,dsg_if.rd_en,dsg_if.wdata);
+      $display("Overall Coverage = %0f%%", sti.cg.get_coverage());
+      $display("Address Coverage = %0f%%", sti.cg.addr_cp.get_coverage());
+      $display("write enable Coverage = %0f%%", sti.cg.wr_en_cp.get_coverage());
+      $display("read enable Coverage = %0f%%", sti.cg.rd_en_cp.get_coverage());
+      $display("Write Data Coverage = %0f%%", sti.cg.wdata_cp.get_coverage());
+      
+    end
+    #100;
+    $finish;
+      end
+    endmodule
+

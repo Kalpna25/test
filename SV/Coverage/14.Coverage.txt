@@ -1,0 +1,115 @@
+class coverGroup;
+  rand int a;
+  rand int b;
+  rand byte c;
+  rand integer d;
+  bit clk;
+  
+  covergroup cg @(posedge clk);
+    cova: coverpoint a {
+      bins a1 = {[0:63]};
+      bins a2 = {[64:127]};
+      bins a3 = {[128:191]};
+      bins a4 = {[192:255]};
+    }
+
+    covb: coverpoint b {
+      bins b1 = {[1:85]};
+      bins b2 = {[86:155]};
+      bins b3 = {[156:200]};
+      bins b4 = {[201:255]};
+      option.auto_bin_max = 8;
+    }
+
+    covc: coverpoint c {
+      bins c1 = {3};
+      bins c2 = {[4:50]};
+      bins c3 = {[51:77]};
+      bins c4 = {[78:127]};
+      option.weight = 2;
+    }
+
+    covd: coverpoint d {
+      bins d1 = {10};
+      bins d2 = {[11:115]};
+      bins d3 = {[116:230]};
+      bins d4 = {[231:255]};
+    } 
+
+    cove: cross cova, covb, covc, covd {
+      bins e1 = binsof(cova.a1) intersect {[100:200]};
+      bins e2 = binsof(cova.a2) intersect {[10:50]};
+      bins e3 = binsof(cova.a3) || binsof(covb.b1);
+      bins e4 = binsof(cova.a4) || binsof(covb.b2);
+      bins e5 = binsof(covb.b3) && binsof(covc.c1);
+      bins e6 = binsof(covb.b4) && binsof(covc.c2);
+//       bins e7 = binsof(cova.a4) intersect {[200:255]};
+//       bins e8 = binsof(covd.d3) intersect {[128:255]};
+      ignore_bins ig1 = binsof(covc.c3) intersect {[5:7]};
+      ignore_bins ig2 = binsof(covc.c4) intersect {[20:30]};
+      illegal_bins il1 = binsof(cova.a1) intersect {[256:511]}; // Adjusted range
+      illegal_bins il2 = binsof(covb.b1) intersect {256, 258, 259}; // Adjusted
+    }
+
+    option.goal = 90; // Set coverage goal to 90%
+    option.name = "CrossCoverageGroup"; // Name the covergroup
+    option.at_least = 1; // Require at least 1 hit per bin
+  endgroup
+
+  // Constructor
+  function new();
+    cg = new();
+  endfunction
+
+  // Randomize values with constraints
+  function void randomize_values();
+    if (!this.randomize() with { 
+      a inside {[0:255]};  // Match cova bins
+      b inside {[0:255]};  // Match covb bins
+      c inside {[0:127]};  // Match covc bins
+      d inside {[0:255]};  // Match covd bins
+    }) begin
+      $display("Randomization failed");
+    end
+  endfunction
+
+  // Sample coverage group
+  function void sample();
+    cg.sample();
+  endfunction
+
+  // Display coverage results
+  function void display_coverage();
+    $display("Coverage Results:");
+    $display("Overall Coverage = %0f%%", cg.get_coverage());
+    $display("cova = %0f%%", cg.cova.get_coverage());
+    $display("covb = %0f%%", cg.covb.get_coverage());
+    $display("covc = %0f%%", cg.covc.get_coverage());
+    $display("covd = %0f%%", cg.covd.get_coverage());
+    $display("cove = %0f%%", cg.cove.get_coverage());
+  endfunction
+endclass
+
+module tb;
+  bit clk;
+  coverGroup coverG;
+
+  // Clock generation
+  initial clk = 0;
+  always #5 clk = ~clk;
+
+  initial begin
+    coverG = new();
+    repeat (450) begin
+      for(int i=0;i<11;i++) begin
+        coverG.randomize_values();
+      $display("Randomized values: a = %0d, b = %0d, c = %0d, d = %0d", coverG.a, coverG.b, coverG.c, coverG.d);  
+       coverG.sample();
+            end
+    end
+    coverG.display_coverage();
+
+    #100;
+    $finish;
+  end
+endmodule

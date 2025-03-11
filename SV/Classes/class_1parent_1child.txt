@@ -1,0 +1,46 @@
+// Code your testbench here
+// or browse Examples
+class parent;
+  int roll_no;
+  string name;
+  string address;
+  //constructor for parent class
+  function new(int roll_no, string name, string address);
+    this.roll_no=roll_no;
+    this.name=name;
+    this.address=address;
+  endfunction
+  //display function for parent class
+  function void display();
+    $display("roll_no:%0d,name:%0s, address:%0s",roll_no,name, address);
+  endfunction
+endclass
+//inherit class
+class child extends parent;
+  int age;
+  string mobile;
+  //constructor for child class
+  function new(int roll_no, string name, string address,int age,string mobile);
+  super.new(roll_no, name, address);  // Call parent constructor with required arguments
+    this.age=age;
+    this.mobile=mobile;
+  endfunction
+  // Display function for child class
+  function void display();
+    super.display();     // Call parent display function
+    $display("age:%0d, mobile:%0s",age, mobile);
+  endfunction
+endclass
+
+module tb;
+parent p;
+child c;
+initial begin
+  // create instances of parent and child class
+p=new(23,"Aarna","delhi");
+c=new(23,"Aarna","delhi",10,"8860214737");
+                 
+  p.display();  //call display for parent
+  c.display();  //call display for child
+end
+endmodule

@@ -1,0 +1,45 @@
+// design for adder and multiplier
+module adder_multiplier(inter inf);
+//   input logic clk,rst,input logic[7:0] a,b,
+//   output logic[7:0]a1,b1);
+  always@(posedge intf.clk or posedge intf.rst)
+    begin
+      if(intf.rst) begin
+      intf.a1<=0;
+        intf.b1<=0;end
+  else begin
+    intf.a1<=intf.a+intf.b;
+    intf.b1<=intf.a*intf.b;
+  end
+    end
+endmodule
+// testbench 
+interface inter(input logic clk);
+  logic rst;
+  logic [7:0] a,b;
+  logic [7:0]a1,b1;
+  modport dut(input clk,rst,a,b,output a1,b1);
+  modport tb(input clk,rst,a1,b1,output a,b);
+  endinterface
+module top;
+  logic clk, rst;
+  inter intf(clk);
+  adder_multiplier u_adder_multiplier (intf);
+  always  #5 clk = ~clk;  
+  initial begin
+    $monitor("Time=%0t | a=%0d b=%0d | a1=%0d b1=%0d ",
+              $time, intf.a, intf.b, intf.a1, intf.b1);
+    clk = 0;rst = 0;
+    #15 rst = 1;  
+    #20;
+    intf.a = 10;
+    intf.b = 5;
+    #20;
+
+    intf.a = 20;
+    intf.b = 2;
+    #20;
+
+    $finish;      
+  end
+endmodule

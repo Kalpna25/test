@@ -1,0 +1,16 @@
+class packet1;
+  rand bit[3:0] data[9];
+  constraint c1{unique{data};};
+   endclass
+module tb;
+  packet1 p;
+  initial begin
+    p=new();
+    repeat(5) begin
+          if(p.randomize)
+            $display("p.data=%0p",p.data);
+         end
+        end
+      endmodule
+      
+      

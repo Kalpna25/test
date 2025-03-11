@@ -1,0 +1,16 @@
+class constraint_add;
+  rand int address;
+  constraint add_range {address >= 32'h00000000 && address <= 32'h002FFFFF;}
+endclass
+module tb;
+constraint_add cons;
+  initial begin
+    cons=new();
+    // Randomize the address with the defined constraint
+    if (cons.randomize()) 
+      begin
+        $display("Generated Address: %0h", cons.address);
+    end 
+  end
+
+endmodule

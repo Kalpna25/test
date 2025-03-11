@@ -1,0 +1,13 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+my $in=<STDIN>;
+    if($in) {
+      my ($fact=$fact($in-1)*$in);
+}
+    else
+    {
+      $fact=1;
+   }
+ print "factorial is:$fact\n";
+   

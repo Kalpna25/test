@@ -1,0 +1,31 @@
+// Code your testbench here
+class parent;
+  rand bit[2:0]a;
+  rand bit[2:0]b;
+  function void display();
+    $display("Parent randomize a:%0d b:%0d",a,b);
+  endfunction
+endclass
+  class child extends parent;
+    rand bit[2:0]c;
+    rand bit[2:0]e;
+    rand parent p;
+    function new();
+      p=new();
+    endfunction
+    function void display();
+      $display("Child randomize c:%0d e:%0d",c,e);
+      p.display;
+    endfunction
+  endclass
+  module tb;
+     child ch;
+    initial begin
+       ch=new();
+      repeat(10) begin
+        if(ch.randomize)
+      ch.display();
+      
+    end
+    end
+  endmodule

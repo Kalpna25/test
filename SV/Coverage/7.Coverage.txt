@@ -1,0 +1,92 @@
+module CoverpointClass;
+
+  // Clock signal
+  bit clk;
+  initial clk = 0;
+  always #25 clk = ~clk;
+
+  // 10-bit signal
+  bit [9:0] signal;
+
+  // Covergroup Class
+  class CovergroupClass;
+
+    // Covergroup Declaration
+    covergroup cg @(posedge clk);
+      option.name = "TenBitSignalCovergroup";
+      option.per_instance = 1;
+      option.weight = 5;
+      option.goal = 100;
+      option.at_least = 1;
+      option.auto_bin_max = 512;
+
+      // Explicit bins
+      cp_explicit: coverpoint signal {
+        bins low_range = {10, 20, 30};
+        bins mid_range = {[100:200]};
+        bins high_value = {900};
+      }
+
+      // Illegal bins
+      cp_illegal: coverpoint signal {
+        illegal_bins illegal_vals = {0, 1, 2};
+      }
+
+      // Ignore bins
+      cp_ignore: coverpoint signal {
+        ignore_bins ignored_vals = {[300:400]};
+      }
+
+      // Wildcard bins
+      cp_wildcard: coverpoint signal {
+        bins wildcard_bins[] = {4'b1x1x, 10'b1111_1000_xxx};
+      }
+    endgroup
+
+    // Constructor
+    function new();
+      cg = new();
+    endfunction
+
+    // Sample method
+    function void sample();
+      cg.sample();
+    endfunction
+
+    // Display coverage results
+    function void display_coverage();
+      $display("Coverage Results:");
+      $display("Overall Coverage = %0f%%", cg.get_coverage());
+      $display("Explicit Bins Coverage = %0f%%", cg.cp_explicit.get_coverage());
+      $display("Illegal Bins Coverage = %0f%% (note: this should remain 0)", cg.cp_illegal.get_coverage());
+      $display("Ignore Bins Coverage = %0f%% (note: this should remain 0)", cg.cp_ignore.get_coverage());
+      $display("Wildcard Bins Coverage = %0f%%", cg.cp_wildcard.get_coverage());
+    endfunction
+
+  endclass
+
+  // Class Instance
+  CovergroupClass covergroup_instance;
+
+  initial begin
+    // Instantiate the class
+    covergroup_instance = new();
+
+    // Dumpfile for waveform
+    $dumpfile("dump.vcd");
+    $dumpvars;
+
+    // Stimulus generation
+    repeat (500) begin
+      @(posedge clk);
+      signal = $urandom % 1024; 
+      covergroup_instance.sample(); 
+    end
+
+    // Display coverage statistics
+    covergroup_instance.display_coverage();
+
+    #100;
+    $finish;
+  end
+endmodule

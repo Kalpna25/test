@@ -1,0 +1,24 @@
+// Code your testbench here
+// or browse Examples
+class packet1;
+  int A;
+endclass
+class packet2;
+  packet1 pkt;
+  int B;
+  function new();
+    pkt=new();
+    endfunction
+endclass
+module tb;
+  packet2 P1,P2;
+  initial begin
+    P1=new();
+    P1.B=10;
+    P1.pkt.A=20;
+    P2=new P1;    $display("P1.B:%0d,P1.pkt.A:%0d",P1.B,P1.pkt.A);
+    P2=P1;
+    P2.B=5;
+    P2.pkt.A=15;    $display("P2.B:%0d,P2.pkt.A:%0d",P2.B,P2.pkt.A);
+  end
+endmodule

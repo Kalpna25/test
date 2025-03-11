@@ -1,0 +1,24 @@
+// inside a function try to call a task which consists of delay statements
+  function void call_task(input int a);
+    $display("FROM FUNCTION");
+    print(a);
+  endfunction
+  
+  task print(input int v);
+    $display("FROM TASK");
+    $display("TIME:%0t VALUE: %d",$time, v);
+  endtask
+module tb;
+  initial begin
+    fork  
+      call_task(15);
+   #5 call_task(10);
+   #2 call_task(5);
+   #3 call_task(6);
+   #1 call_task(8);
+    join_none
+    wait fork;
+	#1;
+    $finish();
+  end
+  endmodule

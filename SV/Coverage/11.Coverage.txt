@@ -1,0 +1,42 @@
+module tb_fsm;
+  typedef enum logic[3:0]{rst,dci,mu,md,dds,uds,doi} state_id;
+  state_id state;
+  logic clk;
+  initial clk=0;
+  always #5 clk=~clk; //Generate clk with 50ns time period
+covergroup fsm_coverage @(posedge clk);
+  option.name = "State_coverage";
+  option.per_instance = 1;
+  option.weight = 1;
+  option.goal = 100;
+  option.at_least = 1;
+  option.auto_bin_max = 3;
+
+  coverpoint state {
+    //Transitions from reset
+    bins b0 = (rst =>[*1:6] rst);
+    bins b1 = (rst => dci => mu =>doi);
+    bins b2 = (rst => dci => md => doi);    
+    bins b3 = (rst => dci => dds => doi);
+    bins b4 = (rst => dci => uds => doi);
+    bins b5 = (rst => dci => mu => dci);
+    bins b6 = (rst => dci => md => dci);
+    bins b7 = (rst => dci => dds => dci);
+    bins b8 = (rst => dci => uds => dci);
+    bins b9 = (rst => dci => uds => doi => dci);
+    bins b10 = (mu => mu);
+    bins b11 = (md => md);
+    bins b12 = (dci => dci);
+     
+  }
+
+endgroup
+  fsm_coverage fsm_cg=new();
+  initial begin
+    @(posedge clk)
+    fsm_cg.sample();
+    $display("coverage:%0.2f%%",fsm_cg.get_coverage());
+    #100;
+    $finish;
+  end
+endmodule

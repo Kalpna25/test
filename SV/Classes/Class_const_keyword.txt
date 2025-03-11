@@ -1,0 +1,27 @@
+// class with const keyword
+class packet;
+  // Declaring constant variables using 'const'
+  const int max_size = 10;
+  const string company_name = "Delhi";  
+  // Regular class variables
+  int size;
+  string name;  
+  // Constructor with parameters
+  function new(int C, string D);
+    this.size = C;        
+    this.name = D;        
+  endfunction  
+  // Method to display packet details
+  function void display();
+    $display("Company Name: %0s, Max Size: %0d", company_name, max_size);
+    $display("Name: %0s, Size: %0d", name, size);
+  endfunction
+endclass
+
+module tb;
+  packet pkt;
+  initial begin
+    pkt = new(20, "test");
+    pkt.display();
+  end
+endmodule

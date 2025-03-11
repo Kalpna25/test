@@ -1,0 +1,85 @@
+class parent;
+  int a, b;
+
+  // Constructor to initialize a and b
+  function new(int a, int b);
+    this.a = a;
+    this.b = b;
+  endfunction
+
+  // Function to add a and b
+  function int add();
+    return a + b;
+  endfunction
+endclass
+
+// Child1 class extending parent
+class child1 extends parent;
+  int c, d;
+
+  // Constructor to initialize c and d
+  function new(int c, int d);
+    super.new(0, 0);  
+    this.c = c;
+    this.d = d;
+  endfunction
+
+  // Function to multiply c and d
+  function int multi();
+    return c * d;
+  endfunction
+endclass
+
+// Child2 class extending child1
+class child2 extends child1;
+  int e, f;
+  function new(int e, int f);
+    super.new(0, 0);  
+    this.e = e;
+    this.f = f;
+  endfunction
+
+  // Function to divide e by f
+  function int div();
+    if (f != 0)
+      return e / f;
+    else
+      return 0;  // Avoid division by zero
+  endfunction
+endclass
+
+// Child3 class extending child2
+class child3 extends child2;
+  int h, g;
+ function new(int h, int g);
+    super.new(0, 0);  // Call the parent constructor
+    this.h = h;
+    this.g = g;
+  endfunction
+  function int mod();
+    return h % g;
+  endfunction
+endclass
+
+// Testbench
+module tb;
+  parent p;
+  child1 ch1;
+  child2 ch2;
+  child3 ch3;
+
+  initial begin
+      p = new(5, 6);  
+    ch1 = new(2, 5);  
+    ch2 = new(12,5);  
+    ch3 = new(7, 3);  
+
+    // Display the results of the operations
+    $display("Addition: %0d", p.add());  
+    $display("Multiplication: %0d", ch1.multi()); 
+    $display("Division: %0d", ch2.div());  
+    $display("Modulus: %0d", ch3.mod());  
+  end
+endmodule
+
+    

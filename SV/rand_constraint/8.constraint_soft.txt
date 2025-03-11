@@ -1,0 +1,21 @@
+class my_class;
+  rand bit [7:0] a, b, c;
+  constraint hard_c1 { a < 50; }
+  constraint hard_c2 { b > 20 && b < 100; }
+  // Soft constraints
+  constraint soft_c1 {soft c < 75; }
+  endclass
+
+module tb;
+  my_class m;
+  initial begin
+    m = new();
+    if(m.randomize) begin
+      $display("m.a = %0d, m.b = %0d, m.c = %0d", m.a, m.b, m.c);
+  end
+       if (m.randomize() with { c >= 75; }) 
+         begin
+      $display("m.a = %0d, m.b = %0d, m.c = %0d", m.a, m.b, m.c);
+        end
+  end
+endmodule

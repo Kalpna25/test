@@ -1,0 +1,34 @@
+module tb;
+  event myevent1, myevent2, myevent3;
+  int count = 0;
+
+  // Trigger events at specific times
+  initial begin
+    #5 -> myevent1;      
+    #10 -> myevent2;     
+    #15 -> myevent3;     
+  end
+
+  // Wait for the first event to trigger
+  initial begin
+ $display("Time=%0t: Waiting for my_event1 to be triggered.", $time);
+    wait (myevent1.triggered)
+    $display("Time=%0t: my_event1 triggered!", $time);
+    count += 1;
+    $display("Time=%0t: Count after my_event1 = %0d", $time, count);    
+  end
+
+  // Wait for all events in order
+  initial begin
+    wait_order(myevent1, myevent2, myevent3)
+    $display("Time=%0t: Events triggered in order (my_event1 -> my_event2 -> my_event3).", $time);
+    count += 1;
+  end
+
+  // Simulation control: Finish after 50 time units
+  initial begin
+    #50;
+    $display("Time=%0t: Simulation finished. Final count = %0d", $time, count);
+    $finish;    
+  end
+endmodule

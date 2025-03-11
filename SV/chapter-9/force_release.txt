@@ -1,0 +1,25 @@
+module tb;
+  reg [7:0] my_var;
+
+  initial begin
+    my_var = 8'h00;
+
+    force my_var = 8'h01;
+    #10;
+    $display("my_var = %h force at time %0t", my_var, $time);
+    release my_var;
+
+    force my_var = 8'h02;
+    #10;
+    $display("my_var = %h force at time %0t", my_var, $time);
+    release my_var;
+
+    force my_var = 8'h03;
+    #10;
+    $display("my_var = %h force at time %0t", my_var, $time);
+    release my_var;
+
+    #20;
+    $finish;
+  end
+endmodule

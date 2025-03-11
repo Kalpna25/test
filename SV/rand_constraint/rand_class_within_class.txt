@@ -1,0 +1,40 @@
+// Code your testbench here
+class randomize1;
+  rand bit [1:0] a;
+  rand bit [1:0] b;
+  function void display();
+    $display("randomize1 a = %0d, b = %0d", a, b);
+  endfunction
+endclass
+
+class randomize2;
+  rand bit [1:0] c;
+  rand bit [1:0] d;
+  rand randomize1 j; 
+
+  function new();
+    j = new();
+  endfunction
+
+  function void display();
+    $display("randomize2 c = %0d, d = %0d", c, d);
+    j.display(); 
+  endfunction
+endclass
+
+module tb;
+  randomize2 rm; 
+
+  initial begin
+    rm = new(); 
+
+    repeat (10) begin
+      if (rm.randomize()) begin
+        $display("\Randomization Successful");
+        rm.display(); 
+      end else begin
+        $display("\Randomization Failed");
+      end
+    end
+  end
+endmodule

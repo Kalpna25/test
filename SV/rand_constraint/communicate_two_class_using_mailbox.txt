@@ -1,0 +1,77 @@
+class producer;
+  mailbox#(string) mb_str; 
+  mailbox#(int) mb_int;    
+  string msg[] = {"Hello", "Kalpna Choudhary", "mailbox"};
+  int num[] = {2, 3, 5, 7};
+
+  // Constructor
+  function new(mailbox#(string) mb_str, mailbox#(int) mb_int);
+    this.mb_str = mb_str;
+    this.mb_int = mb_int;
+  endfunction
+
+  // Producer task
+  task run();
+    foreach (msg[i]) begin
+      #2;
+      mb_str.put(msg[i]); 
+      $display("[Producer] Sent string='%0s' at time=%0t", msg[i], $time);
+    end
+    foreach (num[i]) begin
+      #1;
+      mb_int.put(num[i]); 
+      $display("[Producer] Sent number=%0d at time=%0t", num[i], $time);
+    end
+  endtask
+endclass
+
+class consumer;
+  mailbox#(string) mb_str;
+  mailbox#(int) mb_int;
+  string s;
+  int i;
+
+  // Constructor
+  function new(mailbox#(string) mb_str, mailbox#(int) mb_int);
+    this.mb_str = mb_str;
+    this.mb_int = mb_int;
+  endfunction
+
+  // Consumer task
+  task run();
+    repeat (3) begin
+      #3;
+      mb_str.get(s); 
+      $display("[Consumer] Received string='%0s' at time=%0t", s, $time);
+    end
+    repeat (4) begin
+      #2;
+      mb_int.get(i); 
+      $display("[Consumer] Received number=%0d at time=%0t", i, $time);
+    end
+  endtask
+endclass
+
+module tb;
+  mailbox#(string) mb_str = new(); 
+  mailbox#(int) mb_int = new();    
+  producer p;
+  consumer c;
+
+  initial begin
+    $display("Start the simulation");
+
+    // Initialize producer and consumer
+    p = new(mb_str, mb_int);
+    c = new(mb_str, mb_int);
+
+    // Start producer and consumer
+    fork
+      p.run();
+      c.run();
+    join
+
+    $display("Simulation ended");
+    $finish;
+  end
+endmodule

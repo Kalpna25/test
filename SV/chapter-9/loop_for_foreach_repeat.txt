@@ -1,0 +1,30 @@
+module tb;
+  // Declare arrays
+  int array1[4][4];     
+  int array2[4];        
+  int array3[4]; 
+  int i=0;
+  initial begin
+    //For loop
+    $display("array1 using nested for loop:");
+    for (int i = 0; i < 4; i++) begin
+      for (int j = 0; j < 4; j++) begin
+        array1[i][j] = i * 10 + j; 
+        $display("array1[%0d][%0d] = %0d", i, j, array1[i][j]);
+      end
+    end
+//Foreach loop
+    $display("\array2 using foreach loop:");
+    foreach (array2[i]) begin
+      array2[i] = i * 2; 
+      $display("array2[%0d] = %0d", i, array2[i]);
+    end
+//repeat loop
+    $display("array3 using repeat loop:");
+    repeat (4) begin
+      array3[i] = i*3; 
+        $display("array3[%0d] = %0d", i, array3[i]);
+     i++;
+    end
+  end
+endmodule

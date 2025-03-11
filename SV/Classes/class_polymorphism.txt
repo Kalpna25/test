@@ -1,0 +1,54 @@
+class parent;  // Base class or parent class
+   virtual function void display();  // Virtual function to display results of the base class
+    $display("parent class");
+  endfunction
+  
+endclass
+
+class child1 extends parent;  // First child class
+  
+  function void display();
+    $display("child1 class");
+  endfunction
+  
+endclass
+
+class child2 extends child1;  // Second child class
+  
+  function void display();
+    $display("child2 class");
+  endfunction
+  
+endclass
+
+class child3 extends child2;  // Third child class
+  
+  function void display();
+    $display("child3 class");
+  endfunction
+  
+endclass
+
+module polymorphism;
+  parent p,p1,p2,p3;  
+  child1 ch1;  
+  child2 ch2;
+  child3 ch3;
+  initial begin
+    p=new();
+    p1=new();
+    p2=new();
+    p3=new();  
+    ch1 = new();  
+    ch2 = new();
+    ch3 = new();
+    p.display();
+    p1=ch1;  
+    p2=ch2;  
+    p3=ch3;  
+    // Call the display function polymorphically
+    p1.display();  // This will call child1's display()
+    p2.display();  // This will call child2's display()
+    p3.display();  // This will call child3's display()
+  end
+endmodule

@@ -1,0 +1,28 @@
+class A;
+  int a = 10;
+  int b = 15;
+  int c = 20;
+   function new(int a, int b, int c);
+    this.a = a + this.a;  
+    this.b = b + this.b;  
+    this.c = c + this.c;  
+  endfunction
+  
+    function void display();
+    $display("a: %0d, b: %0d, c: %0d", a, b, c);
+  endfunction
+endclass
+
+module tb;
+  A a1, a2;
+  
+  initial begin
+    a1 = new(5, 10, 15);  
+    a2 = new(3, 8, 12);  
+    
+    a1.display();  
+    a2.display();  
+  end
+endmodule
+
+  

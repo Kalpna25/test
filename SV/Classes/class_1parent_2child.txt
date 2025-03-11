@@ -1,0 +1,67 @@
+// Code your testbench here
+class rectangle;
+  int len,wid;
+   //constructor for parent class
+  function new(int len,wid);
+    this.len=len;
+    this.wid=wid;
+    endfunction
+  function int area();
+    return (len*wid);
+  endfunction
+  function int perimeter();
+    return 2*(len+wid);
+  endfunction
+ endclass
+//inherit class
+class square extends rectangle;
+  int size;
+  //constructor for child class
+  function new(int size);
+    super.new(size,size);  // Call parent constructor with required arguments
+    this.size=size;
+    endfunction
+ endclass
+class triangle extends square;
+  int a,b,c;
+  //constructor for child class
+  function new(int a,b,c);
+    super.new(a);  // Call parent constructor with required arguments
+    this.a=a;
+    this.b=b;
+    this.c=c;
+    endfunction
+  
+  // Function to calculate the perimeter of the triangle
+  function int perimeter();
+    return (a + b + c); // Simple perimeter calculation for the triangle
+  endfunction
+
+  // Function to calculate the area of the triangle (assuming a simple base-height formula)
+  function int area();
+    // For now, we will use the base-height formula, but feel free to change this logic
+    return (a * b) / 2; // Placeholder area calculation
+  endfunction
+ endclass
+
+module tb;
+rectangle rect;
+square sq;
+triangle tria;
+initial begin
+  // create instances of parent and child class
+  rect=new(5,4);
+  sq=new(4);
+  tria=new(3,4,5);
+  $display("Rectangle Area: %0d", rect.area());
+  $display("Rectangle Perimeter: %0d", rect.perimeter());
+
+    // Display the area and perimeter of the square
+    $display("Square Area: %0d", sq.area());
+    $display("Square Perimeter: %0d", sq.perimeter());
+  // Display the area and perimeter of the triangle
+  $display("Triangle Area: %0d", tria.area());
+  $display("Triangle Perimeter: %0d", tria.perimeter());
+end
+endmodule
+

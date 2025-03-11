@@ -1,0 +1,18 @@
+module tb;
+  int counter = 0; 
+
+  initial begin
+    for (;;)
+    begin
+      $display("Counter value: %0d at time: %0t", counter, $time);
+      counter++; 
+      #10;      
+      if (counter == 10) begin
+        $display("Exiting infinite loop after 10 iterations.");
+        break; 
+      end
+    end
+
+    $finish; 
+  end
+endmodule

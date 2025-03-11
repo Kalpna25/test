@@ -1,0 +1,23 @@
+module tb;
+  int i;
+  initial begin
+    //using break
+    $display("Using 'break' in a loop:");
+        for (i = 0; i < 10; i++) begin
+          $display("start the loop at i = %0d", i);
+      if (i == 5) begin
+        $display("Breaking the loop at i = %0d", i);
+        break; 
+      end
+    end
+
+//using continue
+    $display("Using 'continue' in a loop:");
+    for (i = 0; i < 10; i++) begin
+      if (i % 2 == 0) begin
+        $display("even number i = %0d", i);
+        continue; 
+      end
+    end
+  end
+endmodule

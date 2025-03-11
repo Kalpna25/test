@@ -1,0 +1,21 @@
+class dynamic_array;
+  bit [3:0]arr[];
+  int a;
+  function new(int b);
+    this.a=b;
+   
+    arr=new[a];
+  endfunction
+  function void display();
+    foreach(arr[i])
+      arr[i]=6;
+    $display(arr);
+  endfunction
+endclass
+module tb;
+  dynamic_array dyn[];
+  initial begin
+    dyn=new(5);
+    dyn.display();
+  end
+endmodule

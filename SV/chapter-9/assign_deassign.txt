@@ -1,0 +1,29 @@
+module tb_assign_deassign;
+
+  reg [7:0] data; 
+  initial begin
+    data = 8'b0000_0000;
+    $display("time:%0t Initial value of data: %0b", $time, data);
+
+    assign data = 8'b1010_1010;
+    $display("time:%0t After assign, value of data: %0b", $time, data);
+
+    #10; 
+     deassign data;
+    $display("time:%0t After deassign, value of data: %0b", $time, data);
+    data = 8'b1100_1100;
+    $display("time:%0t After procedural assignment, value of data: %0b", $time, data);
+
+    #10; 
+    assign data = 8'b1111_0000;
+    $display("time:%0t After second assign, value of data: %0b", $time, data);
+
+    #10;
+    deassign data;
+    $display("time:%0t After second deassign, value of data: %0b", $time, data);
+
+    data = 8'b0000_1111;
+    $display("time:%0t Final value of data after procedural assignment: %0b", $time, data);
+  end
+
+endmodule

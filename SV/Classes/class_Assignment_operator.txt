@@ -1,0 +1,40 @@
+// Assignment Operator
+class base1;
+  int a;
+  endclass
+class base2;
+  int b;
+  base1 x;
+  function new();
+    x=new();
+  endfunction
+endclass
+module tb;
+  base2 b1,b2;
+  initial begin
+    b1=new();
+    b1.x.a=10;
+    b1.b=20;
+    b2=b1;
+    $display("b1.x.a:%0d,b1.b:%0d",b1.x.a,b1.b);
+    $display("b2.x.a:%0d,b2.b:%0d",b2.x.a,b2.b);
+      if (b2==b1)
+      $display("b2==b1:TRUE (same reference)");
+    else
+      $display("b2==b1:FALSE");
+        if (b2===b1)
+      $display("b2===b1:TRUE (same values and references)");
+    else
+      $display("b2===b1:FALSE");
+      
+      if (b2!=b1)
+      $display("b2!=b1:TRUE (different references)");
+    else
+      $display("b2!=b1:FALSE");
+      
+     if (b2!==b1)
+      $display("b2!==b1:TRUE (different values or references)");
+    else
+      $display("b2!==b1:FALSE");
+  end
+endmodule

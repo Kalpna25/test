@@ -1,0 +1,64 @@
+// Code your testbench here
+// or browse Examples
+class my_class;
+    // Fixed array
+  bit [7:0] fixed_array;
+
+    // Dynamic array
+    int dynamic_array[];
+
+    // Queue
+  int queue[$]='{1,5,7,8,9,11};
+
+    // Associative array
+    int associative_array[string];
+
+    function void initialize();
+        // Initialize fixed array
+ fixed_array=8'b1010_1111;
+
+        // Initialize dynamic array
+        dynamic_array = new[5];
+        foreach (dynamic_array[i])
+            dynamic_array[i] = i;
+
+        // Initialize queue
+     queue.push_front (3);
+      queue.push_back(22);
+      queue.push_back(13);
+
+        // Initialize associative array
+        associative_array["one"] = 1;
+        associative_array["two"] = 2;
+        associative_array["three"] = 3;
+    endfunction
+
+    function void display();
+        // Display fixed array
+        $display("Fixed array:");
+      $display("fixed_array = %0b", fixed_array);
+
+        // Display dynamic array
+        $display("Dynamic array:");
+        foreach (dynamic_array[i])
+            $display("dynamic_array[%0d] = %0d", i, dynamic_array[i]);
+
+        // Display queue
+      $display("Queue:");        $display("queue = %0p", queue);
+
+        // Display associative array
+        $display("Associative array:");
+        foreach (associative_array[key])
+            $display("associative_array[%s] = %0d", key, associative_array[key]);
+    endfunction
+endclass
+
+module tb;
+    my_class obj;
+
+    initial begin
+        obj = new();
+        obj.initialize();
+        obj.display();
+    end
+endmodule

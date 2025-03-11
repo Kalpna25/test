@@ -1,0 +1,53 @@
+class my_class;
+  rand bit [7:0] a, b, c;
+
+  // Constraints
+  constraint c1 { a < 50; }
+  constraint c2 { b > 20 && b < 100; }
+  constraint c3 { c % 2 == 0; } 
+  // Method to display variable values
+  function void display();
+    $display("a = %0d, b = %0d, c = %0d", a, b, c);
+  endfunction
+endclass
+
+module tb;
+  my_class m;
+
+  initial begin
+    m = new();
+    $display("All constraints enabled");
+    if (m.randomize()) begin
+      m.display();
+    end 
+      $display("Disable constraint c1");
+    m.c1.constraint_mode(0); 
+    if (m.randomize())
+      begin
+      m.display();
+    end 
+    $display("Disable constraint c2 and enable c1");
+    m.c1.constraint_mode(1); // Enable c1
+    m.c2.constraint_mode(0); // Disable c2
+    if (m.randomize()) 
+      begin
+      m.display();
+    end
+    $display("Disable all constraints");
+    m.c1.constraint_mode(0);
+    m.c2.constraint_mode(0);
+    m.c3.constraint_mode(0);
+    if (m.randomize()) 
+      begin
+      m.display();
+    end 
+    $display("Enable all constraints");
+    m.c1.constraint_mode(1);
+    m.c2.constraint_mode(1);
+    m.c3.constraint_mode(1);
+    if (m.randomize()) 
+      begin
+      m.display();
+    end
+  end
+endmodule

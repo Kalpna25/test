@@ -1,0 +1,64 @@
+// Parent class
+class parent;
+    int A;
+    function new(int A);
+        this.A = A;
+    endfunction
+    function void display();
+        $display("A: %0d", A);
+    endfunction
+endclass
+
+// Child1 class (inherits from parent)
+class child1 extends parent;
+    int B;
+    function new(int B);
+        super.new(A);  // Call the constructor of the parent class
+        this.B = B;
+    endfunction
+    function void display();
+        $display("B: %0d", B);
+    endfunction
+endclass
+
+// Child2 class (inherits from child1)
+class child2 extends child1;
+    int C;
+    function new(int C);
+        super.new(B);  // Call the constructor of the parent class (child1)
+        this.C = C;
+    endfunction
+    function void display();
+        $display("C: %0d", C);
+    endfunction
+endclass
+
+// Child3 class (inherits from child2)
+class child3 extends child2;
+    string D;
+    function new(string D);
+        super.new(C);  // Call the constructor of the parent class (child2)
+        this.D = D;
+    endfunction
+    function void display();
+        $display("D: %0s", D);
+    endfunction
+endclass
+
+module tb;
+    parent p;
+    child1 c1;
+    child2 c2;
+    child3 c3;
+    
+    initial begin
+        p = new(10);      
+        c1 = new(20);   
+        c2 = new(40); 
+        c3 = new("Hello"); 
+        p.display();
+        c1.display();
+        c2.display();
+        c3.display();
+    end
+endmodule

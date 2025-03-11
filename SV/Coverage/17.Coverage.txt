@@ -1,0 +1,68 @@
+write a coverage module seperately, generate stimulus in testbench bind the coverage module and testbench for 4*10 decoder design, (include coverpoints with explicit bins, cross, ignore_bin in the covergroup)
+(use of option_name option_per_instance,option.weight.goal,option.at_least, option_auto_bin_max)
+*/
+
+module coverage_module();
+    covergroup decoder_cg;
+        option.name = "decoder_coverage";
+        option.per_instance = 1;
+        option.weight = 1;
+        option.goal = 100;
+        option.at_least = 1;
+        option.auto_bin_max = 256;
+        
+        // Coverpoint for input
+        cp_in: coverpoint tb.in {
+            bins valid_range[] = {[0:9]};
+            ignore_bins invalid = {[10:15]}; 
+        }
+           
+        // Coverpoint for output
+        cp_out: coverpoint $countones(tb.out) {
+            bins zero = {0};  
+            bins one = {1};  
+        }
+    endgroup
+
+    // Instantiate the covergroup
+    decoder_cg cg;
+
+    initial begin
+        cg = new(); 
+        $display("Coverage object created");
+    end
+endmodule
+
+
+module tb;
+logic [3:0] in;  
+logic [9:0] out; 
+
+    // One-hot encoding logic
+    always_comb begin
+        out = 10'b0;
+        out[in] = 1;
+    end
+
+    // Bind the coverage module to this testbench
+    bind tb coverage_module cover_mod();
+
+    initial begin
+        // Generate stimuli
+      repeat (100) begin
+            std::randomize(in) with { in inside {[0:15]}; };
+            #1; 
+            $display("Input = %b, Output = %b", in, out);
+            cover_mod.cg.sample(); 
+        end
+
+        // Display coverage results
+        $display("Total Coverage: %0.2f%%", cover_mod.cg.get_coverage());
+        $display("cp_in Coverage: %0.2f%%", cover_mod.cg.cp_in.get_coverage());
+        $display("cp_out Coverage: %0.2f%%", cover_mod.cg.cp_out.get_coverage());
+        
+
+        #100;
+        $finish; 
+    end
+endmodule

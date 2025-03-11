@@ -1,0 +1,27 @@
+//static function
+class parent;
+static int a,b;
+static function int add(int a,b);
+    a=a+b;
+    return a;
+  endfunction
+endclass
+module tb;
+  parent p1;
+  byte c;
+  initial begin
+    p1=new();
+    p1.a=10;
+    p1.b=20;
+    repeat(2) begin
+    c=p1.add(10,20);
+    $display("p2=%0d",c);
+    end
+    p1.a=5;
+    p1.b=6;
+    c=p1.add(5,6);
+    $display("p2=%0d",c);
+  end
+endmodule
+    
+  

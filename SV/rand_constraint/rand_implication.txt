@@ -1,0 +1,13 @@
+class fibonacci;
+  rand int a[10];
+  constraint c{a[0]==0;a[1]==1;foreach (a[i]) if(i>=2) a[i]==a[i-1]+a[i-2];}
+endclass
+
+module tb;
+  fibonacci fb;
+  initial begin
+    fb=new();
+    if(fb.randomize)
+      $display("fb.a=%p",fb.a);
+  end
+endmodule

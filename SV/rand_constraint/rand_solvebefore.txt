@@ -1,0 +1,17 @@
+class solvebefore;
+rand bit a;
+rand bit [1:0] b;
+  constraint SB_ab { (a==0) -> (b==0);
+solve a before b; }
+ endclass
+module tb;
+  solvebefore sv;
+  initial begin
+    sv=new();
+    repeat(15)
+    if(sv.randomize)
+      $display("sv.a=%b sv.b=%b",sv.a, sv.b);
+    
+  end
+endmodule
+    

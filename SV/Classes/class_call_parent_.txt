@@ -1,0 +1,51 @@
+// Parent class
+class parent;
+    int a;  
+    task display();  
+    $display("Parent class");
+    endtask
+endclass
+
+// Child1 class that inherits from Parent
+class child1 extends parent;
+    int b;  
+    task display();  
+        $display("Child1 class");
+    endtask
+endclass
+
+// Child2 class that inherits from Child1 
+class child2 extends child1;
+    int c;  
+    task display();  
+        $display("Child2 class");
+    endtask
+endclass
+
+// Testbench module
+module tb;
+    parent p;
+    child1 c1;
+    child2 c2;
+    
+    initial begin
+        // Create instances of parent and child classes
+        p = new();
+        c1 = new();
+        c2 = new();
+         p.display();  
+        c1.display(); 
+        c2.display(); 
+
+        p.a = 4;
+    $display("Parent class variable: %0d", p.a);
+
+        c1.a = 3;  
+        c1.b = 15; 
+   $display("Child1 class variables: a=%0d, b=%0d", c1.a, c1.b);
+        c2.a = 5;  
+        c2.b = 20; 
+        c2.c = 10; 
+        $display("Child2 class variables: a=%0d, b=%0d, c=%0d", c2.a, c2.b, c2.c);
+    end
+endmodule

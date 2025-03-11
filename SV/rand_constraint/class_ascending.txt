@@ -1,0 +1,16 @@
+Code your testbench here
+class ascending;
+  rand int array[];
+  constraint c1{array.size==5;}
+  constraint c3{foreach(array[i]) {array[i] inside{[0:50]};if(i>0) array[i]>array[i-1];}}  
+endclass
+  module tb;
+  ascending as;
+  initial begin
+    as=new();
+    repeat(5) begin
+      if(as.randomize)
+        $display("as.array=%p",as.array);
+    end
+  end
+endmodule

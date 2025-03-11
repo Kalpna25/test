@@ -1,0 +1,18 @@
+// class with static
+
+class packet;
+static int a=10,b=15;
+endclass
+module tb;
+  packet pkt1,pkt2;
+  initial begin
+    pkt1=new();
+    pkt2=new();
+    $display("pkt1_a=%0d pkt1_b=%0d",pkt1.a,pkt1.b);
+    $display("pkt2_a=%0d pkt2_b=%0d",pkt2.a,pkt2.b);
+    pkt1.a=2;
+    pkt2.b=6;
+    $display("pkt1_a=%0d pkt1_b=%0d",pkt1.a,pkt1.b);
+    $display("pkt2_a=%0d pkt2_b=%0d",pkt2.a,pkt2.b);
+  end
+endmodule

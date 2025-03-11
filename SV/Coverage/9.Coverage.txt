@@ -1,0 +1,50 @@
+// // experiment passing three arguments to covergroup and use those areguements inside that covergroup
+
+// // (use of option.name,option.per instance,option.weight,option goal,option.at_least,option.auto_bin_max)
+module Covergroup_with_arguments;
+  bit [9:0] signal;
+  bit clk;
+  initial clk = 0;
+  always #25 clk = ~clk;
+  class Arg_Cov;
+covergroup cg(bit [9:0] low, bit [9:0] mid_start, bit [9:0] mid_end) @(posedge clk);
+      option.name = "Argument_Covergroup";
+      option.per_instance = 1;
+      option.weight = 5;
+      option.goal = 100;
+      option.at_least = 1;
+      option.auto_bin_max = 500;
+      cp_signal: coverpoint signal {
+        bins low_bin = {low};
+        bins mid_range = {[mid_start:mid_end]};
+        bins high_bin = {mid_end + 1, mid_end + 2,mid_end+3};       }
+    endgroup
+    function new(bit [9:0] low, bit [9:0] mid_start, bit [9:0] mid_end);
+      cg = new(low, mid_start, mid_end);
+    endfunction
+    function void sample();
+      cg.sample();
+    endfunction
+     function void display_coverage();
+      $display("Coverage Results:");
+      $display("Signal = %0d", signal);
+      $display("Overall Coverage = %0f%%", cg.get_coverage());
+      $display("Signal Coverage = %0f%%", cg.cp_signal.get_coverage());
+    endfunction
+  endclass
+  Arg_Cov acov;
+  initial begin
+    acov = new(5, 50, 100);
+     repeat (500) begin
+       for(int i=0;i<10;i++) begin
+      @(posedge clk);
+      signal = $urandom % 1024; 
+     end
+       acov.sample();
+     end
+    acov.display_coverage();
+
+    #100;
+    $finish;
+  end
+endmodule
