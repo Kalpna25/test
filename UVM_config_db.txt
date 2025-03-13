@@ -1,0 +1,117 @@
+`include "uvm_macros.svh"
+import uvm_pkg::*;
+
+// config_db
+class my_config extends uvm_object;
+  `uvm_object_utils(my_config)
+  int int_value;
+  string str_value;
+
+  function new(string name = "my_config");
+    super.new(name);
+  endfunction
+endclass
+
+class my_driver extends uvm_driver;
+  `uvm_component_utils(my_driver)
+
+  int int_val;
+  string str_val;
+  my_config cfg;
+
+  function new(string name, uvm_component parent);
+    super.new(name, parent);
+  endfunction
+
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+
+    // Getting int and string from config_db
+    if (!uvm_config_db#(int)::get(this, "", "int_val", int_val)) 
+      `uvm_warning("CONFIG_DB", "int_val not found!")
+
+    if (!uvm_config_db#(string)::get(this, "", "str_val", str_val)) 
+      `uvm_warning("CONFIG_DB", "str_val not found!")
+
+    // Getting object from config_db
+    if (!uvm_config_db#(my_config)::get(this, "", "config_obj", cfg))
+      `uvm_warning("CONFIG_DB", "config_obj not found!")
+    else
+      `uvm_info("CONFIG_DB", $sformatf("Got Config Object: int=%0d, str=%s", cfg.int_value, cfg.str_value), UVM_MEDIUM)
+  endfunction
+
+  task run_phase(uvm_phase phase);
+    phase.raise_objection(this);
+    #10;
+    `uvm_info("CONFIG_DB", $sformatf("Driver: int_val=%0d, str_val=%s", int_val, str_val), UVM_MEDIUM)
+    phase.drop_objection(this);
+  endtask
+endclass
+// Agent class
+class my_agent extends uvm_agent;
+  `uvm_component_utils(my_agent)
+  my_driver drv;
+
+  function new(string name, uvm_component parent);
+    super.new(name, parent);
+  endfunction
+
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    drv = my_driver::type_id::create("drv", this);
+  endfunction
+endclass
+// Environment class
+class my_env extends uvm_env;
+  `uvm_component_utils(my_env)
+  my_agent agt;
+
+  function new(string name, uvm_component parent);
+    super.new(name, parent);
+  endfunction
+
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    agt = my_agent::type_id::create("agt", this);
+  endfunction
+endclass
+
+// Test class
+class my_test extends uvm_test;
+  `uvm_component_utils(my_test)
+  my_env env;
+  my_config cfg;
+
+  function new(string name, uvm_component parent);
+    super.new(name, parent);
+  endfunction
+
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    env = my_env::type_id::create("env", this);
+
+    // Setting int and string values
+    uvm_config_db#(int)::set(this, "env.agt.drv", "int_val", 42);
+    uvm_config_db#(string)::set(this, "env.agt.drv", "str_val", "Hello UVM!");
+
+    // Corrected instantiation of config object
+    cfg = my_config::type_id::create("cfg");
+    cfg.int_value = 99;
+    cfg.str_value = "Config Object Data";
+    uvm_config_db#(my_config)::set(this, "env.agt.drv", "config_obj", cfg);
+
+   endfunction
+
+  task run_phase(uvm_phase phase);
+    phase.raise_objection(this);
+        #20;
+    phase.drop_objection(this);
+  endtask
+endclass
+
+// Top-level module
+module testbench;
+  initial begin
+    run_test("my_test");
+  end
+endmodule
