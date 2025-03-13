@@ -1,0 +1,98 @@
+// Code your design here
+`include "uvm_macros.svh"
+import uvm_pkg::*;
+class trans extends uvm_transaction;
+  `uvm_object_utils(trans)
+rand int data;
+  constraint c { data inside{[0:5]};}
+  function new(string name = "trans");
+    super.new(name);
+  endfunction
+endclass
+// producer.sv
+class producer extends uvm_component;
+  `uvm_component_utils(producer) 
+   uvm_blocking_get_imp#(trans, producer) get_imp;
+
+  function new(string name = "producer", uvm_component parent);
+    super.new(name, parent);
+    get_imp = new("get_imp", this);
+  endfunction
+  
+  virtual task get(output trans t);
+    t=trans::type_id::create("t");
+    repeat(3) begin
+      if(t.randomize())
+      `uvm_info("[producer]", $sformatf("Sent data: %0d", t.data), UVM_NONE);
+    end
+  endtask
+        
+endclass
+
+// consumer.sv
+class consumer extends uvm_component; 
+  `uvm_component_utils(consumer)
+  
+  uvm_blocking_get_port#(trans) get_port; 
+
+  function new(string name = "consumer", uvm_component parent);
+    super.new(name, parent);
+    get_port = new("get_port", this); // Initialize put_imp inside the constructor
+  endfunction
+  
+   task run_phase(uvm_phase phase);
+    trans t;
+           repeat(3) begin
+         get_port.get(t); // Request data from producer
+     `uvm_info("[Consumer]", $sformatf("Received data: %0d", t.data), UVM_NONE);
+         end
+  endtask
+endclass
+
+
+// my_env.sv
+class my_env extends uvm_env;
+  producer prod;
+  consumer cons;
+  `uvm_component_utils(my_env)
+  
+  function new(string name = "my_env", uvm_component parent);
+    super.new(name, parent);
+  endfunction
+
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    prod = producer::type_id::create("prod", this);
+    cons = consumer::type_id::create("cons", this);
+  endfunction
+
+  function void connect_phase(uvm_phase phase);
+    super.connect_phase(phase);
+   cons.get_port.connect(prod.get_imp);
+  endfunction
+endclass
+
+// my_test.sv
+class my_test extends uvm_test;
+  
+  `uvm_component_utils(my_test)
+  my_env env;
+
+
+  function new(string name = "my_test", uvm_component parent);
+    super.new(name, parent);
+  endfunction
+
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    env = my_env::type_id::create("env", this);
+  endfunction
+    
+endclass
+
+// tb_top.sv
+module tb_top;
+  initial begin
+    run_test("my_test");
+  end
+endmodule

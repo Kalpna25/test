@@ -1,0 +1,124 @@
+`include "uvm_macros.svh"
+import uvm_pkg::*;
+
+//Base Class
+class A extends uvm_object;
+  `uvm_object_utils(A)
+  function new (string name="A");
+    super.new(name);
+  endfunction
+endclass
+
+class B extends A;
+  `uvm_object_utils(B)
+  function new(string name="A");
+    super.new(name);
+  endfunction
+  endclass
+
+class C extends B;
+  `uvm_object_utils(C)
+  function new(string name="C");
+    super.new(name);
+  endfunction
+endclass
+
+class D extends B;
+  `uvm_object_utils(D)
+  function new(string name="D");
+    super.new(name);
+  endfunction
+endclass
+
+class E extends A;
+  `uvm_object_utils(E)
+  function new(string name="E");
+    super.new(name);
+  endfunction
+endclass
+
+class F extends E;
+  `uvm_object_utils(F)
+  function new(string name="F");
+    super.new(name);
+  endfunction
+endclass
+
+//Overrides
+class c1 extends C;
+  `uvm_object_utils(c1)
+  function new(string name="c1");
+    super.new(name);
+  endfunction
+endclass
+
+class c2 extends C;
+  `uvm_object_utils(c2)
+  function new(string name="c2");
+    super.new(name);
+  endfunction
+endclass
+
+class d1 extends D;
+  `uvm_object_utils(d1)
+  function new(string name="d1");
+    super.new(name);
+  endfunction
+endclass
+
+class d2 extends D;
+  `uvm_object_utils(d2)
+  function new(string name="d2");
+    super.new(name);
+  endfunction
+endclass
+
+module tb;
+  A A_obj;
+  B B_obj;
+  C C_obj;
+  D D_obj;
+  E E_obj;
+  F F_obj;
+  initial begin
+    uvm_factory factory = uvm_factory::get();
+    // Instance overrides for C class
+    factory.set_inst_override_by_type(C::get_type(),c1::get_type(),"s3");
+    factory.set_inst_override_by_type(C::get_type(),c2::get_type(),"s5");
+    factory.set_inst_override_by_type(C::get_type(),c2::get_type(),"s8");
+    
+    factory.set_inst_override_by_type(D::get_type(),d1::get_type(),"s4");
+    factory.set_inst_override_by_type(D::get_type(),d2::get_type(),"s6");
+    factory.set_inst_override_by_type(D::get_type(),d2::get_type(),"s9");
+    
+    // Type override for all C instances
+    factory.set_type_override_by_type(C::get_type(),c2::get_type());  
+    factory.set_type_override_by_type(D::get_type(),d2::get_type());
+   
+    
+  	 // Object Instantiations
+    A_obj = A::type_id::create("A_obj");
+    B_obj = B::type_id::create("B_obj");
+    
+    C_obj = C::type_id::create("s3");
+    C_obj = C::type_id::create("s5");
+    C_obj = C::type_id::create("s8");
+
+    D_obj = D::type_id::create("s4");
+    D_obj = D::type_id::create("s6");
+    D_obj = D::type_id::create("s9");
+
+    E_obj = E::type_id::create("E_obj");
+    F_obj = F::type_id::create("F_obj");
+    //UVM Info messages
+    
+   `uvm_info("TB", $sformatf("C(s3) instance: %s", C_obj.get_type_name()), UVM_MEDIUM)
+    `uvm_info("TB", $sformatf("C(s5) instance: %s", C_obj.get_type_name()), UVM_MEDIUM)
+    `uvm_info("TB", $sformatf("C(s8) instance: %s", C_obj.get_type_name()), UVM_MEDIUM)
+    
+    `uvm_info("TB", $sformatf("D(s4) instance: %s", D_obj.get_type_name()), UVM_MEDIUM)
+    `uvm_info("TB", $sformatf("D(s6) instance: %s", D_obj.get_type_name()), UVM_MEDIUM)
+    `uvm_info("TB", $sformatf("D(s9) instance: %s", D_obj.get_type_name()), UVM_MEDIUM)
+  end
+endmodule
+ 

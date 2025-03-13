@@ -1,0 +1,174 @@
+`include "uvm_macros.svh"
+import uvm_pkg::*;
+//Sequence item
+class my_transaction extends uvm_sequence_item;
+    
+  `uvm_object_utils(my_transaction)
+  randc byte data;
+  constraint c{ data inside{[0:10]};}  
+  function new(string name = "my_transaction");
+    super.new(name);
+  endfunction
+  
+endclass
+
+//Producer
+class producer extends uvm_component;
+  `uvm_component_utils(producer)
+  
+  uvm_blocking_put_imp#(my_transaction, producer) put_imp; //Accepts transactions from other components (blocking put).
+  uvm_get_peek_imp#(my_transaction, producer) get_peek_imp; //Allows consumers to get or peek transactions.
+  
+  my_transaction queue[$];  // Declares a queue to store transactions.
+  
+  function new(string name = "producer", uvm_component parent = null);
+    super.new(name, parent);
+    put_imp = new("put_imp", this);
+    get_peek_imp = new("get_peek_imp", this);
+  endfunction
+  //Adds a transaction to the queue and logs it
+  virtual function void put(my_transaction tr);
+    queue.push_back(tr);
+    `uvm_info("producer", $sformatf("Received data = %0d", tr.data), UVM_MEDIUM)
+  endfunction
+  //Retrieves and removes the first transaction from the queue.
+  virtual function void get(output my_transaction tr);
+    if (queue.size() > 0) begin
+      tr = queue.pop_front();
+      `uvm_info("producer", $sformatf("get(): Returning data = %0d", tr.data), UVM_MEDIUM)
+    end
+    else
+      `uvm_error("producer", "get() called but queue is empty!")
+  endfunction
+//Retrieves (but does not remove) the first transaction.
+  virtual function void peek(output my_transaction tr);
+    if (queue.size() > 0) begin
+      tr = queue[0];
+      `uvm_info("producer", $sformatf("peek(): Peeking data = %0d", tr.data), UVM_MEDIUM)
+    end
+    else
+      `uvm_error("producer", "peek() called but queue is empty!")
+  endfunction
+//Attempts to retrieve a transaction and returns success status.
+  virtual function bit try_get(output my_transaction tr);
+    if (queue.size() > 0) begin
+      tr = queue.pop_front();
+      `uvm_info("producer", $sformatf("try_get(): Returning data = %0d", tr.data), UVM_MEDIUM)
+      return 1;
+    end
+    return 0;
+  endfunction
+//Attempts to peek a transaction and returns success status.
+  virtual function bit try_peek(output my_transaction tr);
+    if (queue.size() > 0) begin
+      tr = queue[0];
+      `uvm_info("producer", $sformatf("try_peek(): Peeking data = %0d", tr.data), UVM_MEDIUM)
+      return 1;
+    end
+    return 0;
+  endfunction
+//Checks if a transaction is available for get()
+  virtual function bit can_get();
+    return (queue.size() > 0);
+  endfunction
+//Checks if a transaction is available for peek().
+  virtual function bit can_peek();
+    return (queue.size() > 0);
+  endfunction
+endclass
+
+//Consumer
+class consumer extends uvm_component;
+  `uvm_component_utils(consumer)
+  
+  uvm_blocking_put_port#(my_transaction) put_port;
+  uvm_get_peek_port#(my_transaction) get_peek_port;
+  
+  function new(string name = "consumer", uvm_component parent = null);
+    super.new(name, parent);
+    put_port = new("put_port", this);
+    get_peek_port = new("get_peek_port", this);
+  endfunction
+
+  virtual task run_phase(uvm_phase phase);
+    my_transaction tr;
+    
+    repeat (5) begin
+      tr = my_transaction::type_id::create("tr");
+      assert(tr.randomize());
+      `uvm_info("consumer", $sformatf("Generated data = %0d", tr.data), UVM_MEDIUM)
+      put_port.put(tr);
+    end
+
+    #10;
+    
+    // Testing try_peek and try_get
+    if (get_peek_port.try_peek(tr))
+      `uvm_info("consumer", $sformatf("try_peek(): Got data = %0d", tr.data), UVM_MEDIUM)
+    else
+      `uvm_info("consumer", "try_peek(): No data available", UVM_MEDIUM)
+
+    if (get_peek_port.try_get(tr))
+      `uvm_info("consumer", $sformatf("try_get(): Got data = %0d", tr.data), UVM_MEDIUM)
+    else
+      `uvm_info("consumer", "try_get(): No data available", UVM_MEDIUM)
+
+    // Testing can_get and can_peek
+    `uvm_info("consumer", $sformatf("can_get() = %0b", get_peek_port.can_get()), UVM_MEDIUM)
+    `uvm_info("consumer", $sformatf("can_peek() = %0b", get_peek_port.can_peek()), UVM_MEDIUM)
+
+    // Getting all remaining transactions
+    while (get_peek_port.can_get()) begin
+      get_peek_port.get(tr);
+      `uvm_info("consumer", $sformatf("get(): Received data = %0d", tr.data), UVM_MEDIUM)
+    end
+
+    `uvm_info("consumer", "Completed Transaction Processing", UVM_MEDIUM)
+  endtask
+endclass
+
+//Environment
+class my_env extends uvm_env;
+  `uvm_component_utils(my_env)
+  
+  producer prod;
+  consumer cons;
+  
+  function new(string name = "my_env", uvm_component parent = null);
+    super.new(name, parent);
+  endfunction
+  
+  virtual function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    prod = producer::type_id::create("prod", this);
+    cons = consumer::type_id::create("cons", this);
+  endfunction
+  
+  virtual function void connect_phase(uvm_phase phase);
+    cons.put_port.connect(prod.put_imp);
+    cons.get_peek_port.connect(prod.get_peek_imp);
+  endfunction
+endclass
+
+//Test 
+class my_test extends uvm_test;
+  `uvm_component_utils(my_test)
+  
+  my_env env;
+  
+  function new(string name = "my_test", uvm_component parent = null);
+    super.new(name, parent);
+  endfunction
+  
+  virtual function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    env = my_env::type_id::create("env", this);
+  endfunction
+endclass
+
+//Top
+module tb;
+   initial begin
+        run_test("my_test");
+  end
+endmodule

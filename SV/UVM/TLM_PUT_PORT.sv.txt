@@ -1,0 +1,90 @@
+`include "uvm_macros.svh"
+import uvm_pkg::*;
+class trans extends uvm_transaction;
+rand int data=10;
+endclass
+// producer.sv
+class producer extends uvm_component;
+  `uvm_component_utils(producer) 
+  int data =10;
+     uvm_blocking_put_port#(trans) put_port;
+
+  function new(string name = "producer", uvm_component parent);
+    super.new(name, parent);
+    put_port = new("put_port", this);
+  endfunction
+  
+ task run_phase(uvm_phase phase);
+   trans t;
+    phase.raise_objection(this);
+    t=new();
+   `uvm_info("[producer]",$sformatf("sent data:%0d",t.data),UVM_NONE);
+   put_port.put(t);
+    phase.drop_objection(this);
+  endtask
+        
+endclass
+
+// consumer.sv
+class consumer extends uvm_component; 
+  `uvm_component_utils(consumer)
+  
+  uvm_blocking_put_imp#(trans, consumer) put_imp; 
+
+  function new(string name = "consumer", uvm_component parent);
+    super.new(name, parent);
+    put_imp = new("put_imp", this); // Initialize put_imp inside the constructor
+  endfunction
+  
+  function void put(trans t);
+    `uvm_info("[Consumer]",$sformatf("rec data:%0d",t.data),UVM_NONE);
+   endfunction
+endclass
+
+
+// my_env.sv
+class my_env extends uvm_env;
+  producer prod;
+  consumer cons;
+
+  `uvm_component_utils(my_env)
+
+  function new(string name = "my_env", uvm_component parent);
+    super.new(name, parent);
+  endfunction
+
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    prod = producer::type_id::create("prod", this);
+    cons = consumer::type_id::create("cons", this);
+  endfunction
+
+  function void connect_phase(uvm_phase phase);
+    super.connect_phase(phase);
+    prod.put_port.connect(cons.put_imp);
+  endfunction
+endclass
+
+// my_test.sv
+class my_test extends uvm_test;
+  
+  `uvm_component_utils(my_test)
+  my_env env;
+
+  function new(string name = "my_test", uvm_component parent);
+    super.new(name, parent);
+  endfunction
+
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    env = my_env::type_id::create("env", this);
+  endfunction
+    
+endclass
+
+// tb_top.sv
+module tb_top;
+  initial begin
+    run_test("my_test");
+  end
+endmodule

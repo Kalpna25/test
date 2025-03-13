@@ -1,0 +1,123 @@
+`include "uvm_macros.svh"
+import uvm_pkg::*;
+
+// Base Sequence Item
+class digi_base_seq_item extends uvm_sequence_item;
+  rand bit a;
+  rand bit b;
+
+  `uvm_object_utils_begin(digi_base_seq_item)
+    `uvm_field_int(a, UVM_ALL_ON)
+    `uvm_field_int(b, UVM_ALL_ON)
+  `uvm_object_utils_end
+
+  function new(string name = "digi_base_seq_item");
+    super.new(name);
+  endfunction
+endclass
+
+// Object Class
+class obj extends uvm_sequence_item;
+  rand bit obj_bit;
+  rand bit [7:0] obj_byte;
+  rand int obj_int;
+  real obj_real;
+  string obj_string;
+
+  `uvm_object_utils_begin(obj)
+    `uvm_field_int(obj_bit, UVM_DEFAULT)
+    `uvm_field_int(obj_byte, UVM_DEFAULT)
+    `uvm_field_int(obj_int, UVM_DEFAULT)
+    `uvm_field_real(obj_real, UVM_DEFAULT)
+    `uvm_field_string(obj_string, UVM_DEFAULT)
+  `uvm_object_utils_end
+
+  function new(string name = "obj");
+    super.new(name);
+  endfunction
+endclass
+
+// Derived Sequence Item
+class digi_seq_item_2 extends digi_base_seq_item;
+  rand bit c;
+  rand bit [3:0] d;
+  rand bit [31:0] e;
+  rand int f;
+  rand bit [5:0] g_array [10];
+  rand byte h;
+  string i;
+  real j;
+
+  typedef enum {IDLE, BUSY, DONE} state_e;
+  rand state_e k_enum;
+  rand int que[$];
+  rand int aa[int];
+
+  obj my_obj; 
+
+  `uvm_object_utils_begin(digi_seq_item_2)
+    `uvm_field_int(c, UVM_ALL_ON)
+    `uvm_field_int(d, UVM_ALL_ON)
+    `uvm_field_int(e, UVM_ALL_ON)
+    `uvm_field_int(f, UVM_ALL_ON)
+    `uvm_field_sarray_int(g_array, UVM_ALL_ON)
+    `uvm_field_int(h, UVM_ALL_ON)
+    `uvm_field_string(i, UVM_ALL_ON)
+    `uvm_field_enum(state_e, k_enum, UVM_ALL_ON)
+    `uvm_field_queue_int(que, UVM_ALL_ON)
+    `uvm_field_aa_int_int(aa, UVM_ALL_ON)
+    `uvm_field_object(my_obj, UVM_ALL_ON)
+  `uvm_object_utils_end
+
+  constraint c1 { d inside {[1:10]}; }
+  constraint c2 { e > 100 && e < 500; }
+  constraint c3 { f % 2 == 0; }
+  constraint c4 { unique {g_array}; }
+  constraint c5 { que.size() == 5; }
+
+  function new(string name = "digi_seq_item_2");
+    super.new(name);
+    my_obj = obj::type_id::create("my_obj"); 
+  endfunction
+endclass
+
+// **Testbench Module**
+module tb;
+  digi_seq_item_2 seq_item1,seq_item2;
+  bit unsigned pack_data[];
+  initial begin
+    // Create an object using the UVM Factory
+    
+    //Create
+    seq_item1 = digi_seq_item_2::type_id::create("seq_item1");
+    //clone
+    $cast(seq_item2,seq_item1.clone());
+    //print
+    seq_item1.print;
+    seq_item2.print;
+    //copy
+    seq_item2.copy(seq_item1);
+   //print
+    seq_item1.print();
+    seq_item2.print();
+    
+    //pack,unpack
+    void' (seq_item1.pack(pack_data));
+    void' (seq_item2.unpack(pack_data));
+    // Print the array contents
+    `uvm_info("TB", $sformatf("g_array=%p", seq_item1.g_array), UVM_LOW)
+    `uvm_info("TB", $sformatf("c=%p", seq_item1.c), UVM_LOW)
+          
+  //print
+    seq_item1.print();
+    seq_item2.print();
+    $display("Converted to string: %s", seq_item1.convert2string());
+       //compare
+    if(seq_item2.compare(seq_item1))
+      `uvm_info("TB","true",UVM_LOW)
+    else
+      `uvm_info("TB","false",UVM_LOW)
+  end
+endmodule
+
+ 
