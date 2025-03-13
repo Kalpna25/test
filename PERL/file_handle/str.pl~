@@ -1,0 +1,56 @@
+
+#!/usr/bin/perl
+use warnings;
+use strict;
+my $date = "13/11/2024";
+chomp($date);
+print "original date: $date\n";
+if ($date =~ /(0[1-9]|1[0-9]|2[0-9]|3[01])([ -:\/\.])([1-9]|1[0-2])([ -:\/\.])((17|18|19|20)\d\d)/)
+{
+my $day   = $1;
+my $sep   = $2; # Separator (e.g., /, -, :, etc.)
+my $month = $3;
+my $year  = $5;
+
+print "Day: $day, Month: $month, Year: $year\n";
+my $converted_date = join(':', $day, $month, $year);
+
+   print "Converted date: $date\n";
+  }
+  else {
+   print "Date format is invalid\n";}
+
+
+=begin
+
+
+#!/usr/bin/perl
+use warnings;
+use strict;
+
+# Define the date string
+my $date = "13/11/2024";
+chomp($date);
+print "Original date: $date\n";
+
+# Perform the regex match on the date to extract day, month, and year
+if ($date =~ /(0[1-9]|1[0-9]|2[0-9]|3[01])([ -:\/\.])([1-9]|1[0-2])([ -:\/\.])((17|18|19|20)\d\d)/) {
+    my $day   = $1;
+    my $sep   = $2; # Separator (e.g., /, -, :, etc.)
+    my $month = $3;
+    my $year  = $5;
+
+    # Print the extracted components
+    print "Day: $day, Month: $month, Year: $year\n";
+    
+    # Print the converted date (changing separator to colon)
+    my $converted_date = join(':', $day, $month, $year);
+    print "Converted date: $converted_date\n";
+} else {
+    print "Date format is invalid\n";
+}
+
+
+=cut
+
+

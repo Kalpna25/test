@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+# $' (postmatch)
+my $str = "Hello World";
+$str =~ /World/;
+print "\$': $'\n";
+
+# $# (array subscript)
+my @array = (1, 2, 3, 4, 5);
+print "\$#: $#{array}\n"; 
+
+# $_ (default variable)
+print "Enter a string: ";
+$_ = <STDIN>;
+chomp;
+print "You entered: $_\n";
+
+# @_ ( subroutine arguments)
+sub greet {
+    print "Hello, @_\n";
+}
+greet("kalpna", "choudhary");
+

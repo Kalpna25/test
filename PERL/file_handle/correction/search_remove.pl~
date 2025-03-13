@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+# Define input and output file names
+my $input_file = "sample2.v";
+my $output_file = "sample3.v";
+
+# Open input file for reading and output file for writing
+open(my $fh_in, '<', $input_file) or die "Cannot open $input_file: $!";
+open(my $fh_out, '>', $output_file) or die "Cannot open $output_file: $!";
+
+# Read input file into an array
+my @content = <$fh_in>;
+print "Content: @content\n";
+
+# Join array into a single string
+my $file_content = join("", @content);
+
+# Remove multiline comments
+$file_content =~ s/\/\*.*?\*\///gs;
+
+# Remove single-line comments
+$file_content =~ s/\/\/.*+//g;
+
+# Remove consecutive blank lines
+$file_content =~ s/\n{2,}/\n/g;
+
+print "$file_content\n";
+
+# Write modified content to output file
+print $fh_out $file_content;
+
+# Close file handles
+close($fh_in);
+close($fh_out);

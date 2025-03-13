@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use feature 'say';
+print"Enter number for pattern:";
+my $num=<STDIN>;
+for(my $i=1;$i<=$num;$i=$i+1)
+{
+for(my $j=0;$j<$i;$j=$j+1)
+{
+print(" ");
+}
+for(my $k=$num;$k>$i;$k=$k-1)
+{
+print("* ");
+}
+say("");
+}
+
+
