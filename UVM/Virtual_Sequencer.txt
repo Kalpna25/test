@@ -1,0 +1,158 @@
+`include "uvm_macros.svh"
+import uvm_pkg::*;
+
+class my_transaction extends uvm_sequence_item;
+    `uvm_object_utils(my_transaction)
+
+    rand bit [7:0] data;
+
+    function new(string name = "my_transaction");
+        super.new(name);
+    endfunction
+
+    virtual function string convert2string();
+        return $sformatf("data = %0h", data);
+    endfunction
+endclass
+
+class my_driver extends uvm_driver#(my_transaction);
+    `uvm_component_utils(my_driver)
+
+    function new(string name, uvm_component parent);
+        super.new(name, parent);
+    endfunction
+
+    virtual task run_phase(uvm_phase phase);
+        my_transaction tr;
+        forever begin
+            seq_item_port.get_next_item(tr);
+     `uvm_info(get_type_name(), $sformatf("Driving Transaction: %s", tr.convert2string()), UVM_MEDIUM)
+            seq_item_port.item_done();
+        end
+    endtask
+endclass
+
+class my_sequencer extends uvm_sequencer#(my_transaction);
+    `uvm_component_utils(my_sequencer)
+
+    function new(string name, uvm_component parent);
+        super.new(name, parent);
+    endfunction
+endclass
+
+class my_sequence extends uvm_sequence#(my_transaction);
+    `uvm_object_utils(my_sequence)
+
+    function new(string name = "my_sequence");
+        super.new(name);
+    endfunction
+
+    virtual task body();
+        my_transaction tr;
+        tr = my_transaction::type_id::create("tr");
+        start_item(tr);
+        assert(tr.randomize());
+        finish_item(tr);
+    endtask
+endclass
+
+class virtual_sequence extends uvm_sequence;
+    `uvm_object_utils(virtual_sequence)
+
+    my_sequence seq1;
+    my_sequence seq2;
+
+    my_sequencer p_sequencer;
+    my_sequencer m_sequencer;
+
+    function new(string name = "virtual_sequence");
+        super.new(name);
+    endfunction
+
+    virtual task body();
+        if (p_sequencer == null || m_sequencer == null) 
+          begin
+            `uvm_error(get_type_name(), "Sequencers are not assigned!")
+            return;
+        end
+
+        seq1 = my_sequence::type_id::create("seq1");
+        seq2 = my_sequence::type_id::create("seq2");
+
+        fork
+            seq1.start(p_sequencer);
+            seq2.start(m_sequencer);
+        join
+    endtask
+endclass
+
+class my_agent extends uvm_agent;
+    `uvm_component_utils(my_agent)
+
+    my_sequencer seqr;
+    my_driver drv;
+
+    function new(string name, uvm_component parent);
+        super.new(name, parent);
+    endfunction
+
+    virtual function void build_phase(uvm_phase phase);
+        super.build_phase(phase);
+        seqr = my_sequencer::type_id::create("seqr", this);
+        drv = my_driver::type_id::create("drv", this);
+    endfunction
+
+    virtual function void connect_phase(uvm_phase phase);
+        drv.seq_item_port.connect(seqr.seq_item_export);
+    endfunction
+endclass
+
+class my_env extends uvm_env;
+    `uvm_component_utils(my_env)
+
+    my_agent agent1;
+    my_agent agent2;
+
+    function new(string name, uvm_component parent);
+        super.new(name, parent);
+    endfunction
+
+    virtual function void build_phase(uvm_phase phase);
+        super.build_phase(phase);
+        agent1 = my_agent::type_id::create("agent1", this);
+        agent2 = my_agent::type_id::create("agent2", this);
+    endfunction
+endclass
+
+class my_test extends uvm_test;
+    `uvm_component_utils(my_test)
+
+    my_env env;
+
+    function new(string name, uvm_component parent);
+        super.new(name, parent);
+    endfunction
+
+    virtual function void build_phase(uvm_phase phase);
+        super.build_phase(phase);
+        env = my_env::type_id::create("env", this);
+    endfunction
+
+    virtual task run_phase(uvm_phase phase);
+        virtual_sequence v_seq;
+        phase.raise_objection(this);
+
+        v_seq = virtual_sequence::type_id::create("v_seq");
+        v_seq.p_sequencer = env.agent1.seqr;
+        v_seq.m_sequencer = env.agent2.seqr;
+        v_seq.start(null);
+
+        phase.drop_objection(this);
+    endtask
+endclass
+
+module testbench;
+    initial begin
+        run_test("my_test");
+    end
+endmodule

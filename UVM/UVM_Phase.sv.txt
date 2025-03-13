@@ -1,0 +1,172 @@
+`include "uvm_macros.svh"
+import uvm_pkg::*;
+
+// Base Class A with pre_reset, reset, post_reset, pre_config
+class A extends uvm_component;
+  `uvm_component_utils(A)
+
+  function new(string name, uvm_component parent);
+    super.new(name, parent);
+  endfunction
+
+  virtual task pre_reset_phase(uvm_phase phase);
+    int delay = $urandom_range(3, 7);
+    phase.raise_objection(this);
+    `uvm_info(get_type_name(), $sformatf("pre_reset phase - time: %0t, delay: %0d,", $time, delay), UVM_HIGH)
+    #(delay);
+    `uvm_info(get_type_name(), "pre_reset phase completed", UVM_HIGH)
+    phase.drop_objection(this);
+  endtask
+
+  virtual task reset_phase(uvm_phase phase);
+    int delay = $urandom_range(3, 7);
+    phase.raise_objection(this);
+    `uvm_info(get_type_name(), $sformatf("reset phase - time: %0t delay: %0d", $time, delay), UVM_HIGH)
+    #(delay);
+    `uvm_info(get_type_name(), "reset phase completed", UVM_HIGH)
+    phase.drop_objection(this);
+  endtask
+
+  virtual task post_reset_phase(uvm_phase phase);
+    int delay = $urandom_range(3, 7);
+    phase.raise_objection(this);
+    `uvm_info(get_type_name(), $sformatf("post_reset phase - time: %0t delay: %0d", $time, delay), UVM_HIGH)
+    #(delay);
+    `uvm_info(get_type_name(), "post_reset phase completed", UVM_HIGH)
+    phase.drop_objection(this);
+  endtask
+
+  virtual task pre_config_phase(uvm_phase phase);
+    int delay = $urandom_range(3, 7);
+    phase.raise_objection(this);
+    `uvm_info(get_type_name(), $sformatf("pre_config phase - time: %0t delay: %0d", $time, delay), UVM_HIGH)
+    #(delay);
+    `uvm_info(get_type_name(), "pre_config phase completed", UVM_HIGH)
+    phase.drop_objection(this);
+  endtask
+endclass
+
+// Class B with config, post_config, pre_main, main
+class B extends uvm_component;
+  `uvm_component_utils(B)
+
+  function new(string name, uvm_component parent);
+    super.new(name, parent);
+  endfunction
+
+  virtual task config_phase(uvm_phase phase);
+    int delay = $urandom_range(3, 7);
+    phase.raise_objection(this);
+    `uvm_info(get_type_name(), $sformatf("config phase - time: %0t delay: %0d", $time, delay), UVM_HIGH)
+    #(delay);
+    `uvm_info(get_type_name(), "config phase completed", UVM_HIGH)
+    phase.drop_objection(this);
+  endtask
+
+  virtual task post_config_phase(uvm_phase phase);
+    int delay = $urandom_range(3, 7);
+    phase.raise_objection(this);
+    `uvm_info(get_type_name(), $sformatf("post_config phase - time: %0t delay: %0d", $time, delay), UVM_HIGH)
+    #(delay);
+    `uvm_info(get_type_name(), "post_config phase completed", UVM_HIGH)
+    phase.drop_objection(this);
+  endtask
+
+  virtual task pre_main_phase(uvm_phase phase);
+    int delay = $urandom_range(3, 7);
+    phase.raise_objection(this);
+    `uvm_info(get_type_name(), $sformatf("pre_main phase - time: %0t delay: %0d", $time, delay), UVM_HIGH)
+    #(delay);
+    `uvm_info(get_type_name(), "pre_main phase completed", UVM_HIGH)
+    phase.drop_objection(this);
+  endtask
+
+  virtual task main_phase(uvm_phase phase);
+    int delay = $urandom_range(3, 7);
+    phase.raise_objection(this);
+    `uvm_info(get_type_name(), $sformatf("main phase - time: %0t delay: %0d", $time, delay), UVM_HIGH)
+    #(delay);
+    `uvm_info(get_type_name(), "main phase completed", UVM_HIGH)
+    phase.drop_objection(this);
+  endtask
+endclass
+
+// Class C with post_main, pre_shutdown, shutdown, post_shutdown
+class C extends uvm_component;
+  `uvm_component_utils(C)
+
+  function new(string name, uvm_component parent);
+    super.new(name, parent);
+  endfunction
+
+  virtual task post_main_phase(uvm_phase phase);
+    int delay = $urandom_range(3, 7);
+    phase.raise_objection(this);
+    `uvm_info(get_type_name(), $sformatf("post_main phase - time: %0t delay: %0d", $time, delay), UVM_HIGH)
+    #(delay);
+    `uvm_info(get_type_name(), "post_main phase completed", UVM_HIGH)
+    phase.drop_objection(this);
+  endtask
+
+  virtual task pre_shutdown_phase(uvm_phase phase);
+    int delay = $urandom_range(3, 7);
+    phase.raise_objection(this);
+    `uvm_info(get_type_name(), $sformatf("pre_shutdown phase - time: %0t delay: %0d", $time, delay), UVM_HIGH)
+    #(delay);
+    `uvm_info(get_type_name(), "pre_shutdown phase completed", UVM_HIGH)
+    phase.drop_objection(this);
+  endtask
+
+  virtual task shutdown_phase(uvm_phase phase);
+    int delay = $urandom_range(3, 7);
+    phase.raise_objection(this);
+    `uvm_info(get_type_name(), $sformatf("shutdown phase - time: %0t delay: %0d", $time, delay), UVM_HIGH)
+    #(delay);
+    `uvm_info(get_type_name(), "shutdown phase completed", UVM_HIGH)
+    phase.drop_objection(this);
+  endtask
+
+  virtual task post_shutdown_phase(uvm_phase phase);
+    int delay = $urandom_range(3, 7);
+    phase.raise_objection(this);
+    `uvm_info(get_type_name(), $sformatf("post_shutdown phase - time: %0t delay: %0d", $time, delay), UVM_HIGH)
+    #(delay);
+    `uvm_info(get_type_name(), "post_shutdown phase completed", UVM_HIGH)
+    phase.drop_objection(this);
+  endtask
+endclass
+
+// Class D with run phase
+class D extends uvm_component;
+  `uvm_component_utils(D)
+
+  function new(string name, uvm_component parent);
+    super.new(name, parent);
+  endfunction
+
+  virtual task run_phase(uvm_phase phase);
+    int delay = $urandom_range(3, 7);
+    phase.raise_objection(this);
+    `uvm_info(get_type_name(), $sformatf("run phase - time: %0t delay: %0d", $time, delay), UVM_HIGH)
+    #(delay);
+    `uvm_info(get_type_name(), "run phase completed", UVM_HIGH)
+    phase.drop_objection(this);
+  endtask
+endclass
+module tb;
+  A a;
+  B b;
+  C c;
+  D d;
+  initial begin
+    a=A::type_id::create("a",null);
+    b=B::type_id::create("b",null);
+    c=C::type_id::create("c",null);
+    d=D::type_id::create("d",null);
+  a.print();
+  b.print();
+  c.print();
+  d.print(); 
+  end
+endmodule
+    

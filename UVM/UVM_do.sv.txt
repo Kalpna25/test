@@ -1,0 +1,81 @@
+`include "uvm_macros.svh" 
+import uvm_pkg::*;
+
+// Base Sequence Item
+class digi_base_seq_item extends uvm_sequence_item;
+  rand bit a;
+  rand bit b;
+
+  `uvm_object_utils_begin(digi_base_seq_item)
+    `uvm_field_int(a, UVM_ALL_ON)
+    `uvm_field_int(b, UVM_ALL_ON)
+  `uvm_object_utils_end 
+
+  function new(string name = "digi_base_seq_item");
+    super.new(name);
+  endfunction
+endclass
+
+// Object Class
+class obj extends uvm_sequence_item;
+  rand bit obj_bit;
+  rand bit [7:0] obj_byte;
+  rand int obj_int;
+  real obj_real;
+  string obj_string;
+
+  `uvm_object_utils_begin(obj)
+    `uvm_field_int(obj_bit, UVM_DEFAULT)
+    `uvm_field_int(obj_byte, UVM_DEFAULT)
+    `uvm_field_int(obj_int, UVM_DEFAULT)
+    `uvm_field_real(obj_real, UVM_DEFAULT)
+    `uvm_field_string(obj_string, UVM_DEFAULT)
+  `uvm_object_utils_end  
+
+  function new(string name = "obj");
+    super.new(name);
+  endfunction
+endclass
+
+// Base Sequence
+class digi_base_seq #(type SEQ_ITEM = digi_base_seq_item) extends uvm_sequence#(SEQ_ITEM);
+  
+  `uvm_object_param_utils(digi_base_seq)
+
+  function new(string name = "digi_base_seq");
+    super.new(name);
+  endfunction
+
+  task body();
+    SEQ_ITEM SEQT;
+    `uvm_info(get_type_name(), "Starting sequence...", UVM_MEDIUM)
+
+    SEQT = SEQ_ITEM::type_id::create("SEQT"); 
+    `uvm_do(SEQT)   // Randomize and send sequence item
+
+    `uvm_info(get_type_name(), "Sequence completed.", UVM_MEDIUM)
+  endtask
+endclass
+class digi_base_test extends uvm_test;
+  `uvm_component_utils(digi_base_test) 
+
+  function new(string name = "digi_base_test", uvm_component parent = null);
+    super.new(name, parent);
+  endfunction
+
+  virtual function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    `uvm_info(get_type_name(), "Testbench build phase", UVM_MEDIUM)
+  endfunction
+
+  task run_phase(uvm_phase phase);
+    `uvm_info(get_type_name(), "Test run phase started", UVM_MEDIUM)
+  endtask
+endclass
+
+// Testbench top module
+module top;
+  initial begin
+    run_test("digi_base_test"); 
+  end
+endmodule
